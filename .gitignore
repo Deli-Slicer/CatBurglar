@@ -1,0 +1,42 @@
+
+# IDEs
+*.sublime-project
+*.sublime-workspace
+.idea/
+/.vscode/
+*.wpr
+*.wpu
+
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Environments
+.env
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# testing
+.pytest_cache/
+.tox/
+.mypy_cache/
+pylint.html
+
+# covereage
+htmlcov/
+.coverage
+
+# build
+.eggs/
+dist/
+build/
+docs/_build
+
+# osx
+.DS_Store
+
