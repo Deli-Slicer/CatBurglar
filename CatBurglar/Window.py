@@ -32,12 +32,28 @@ class Window(arcade.Window):
         self.zoom_speed = .95
 
         self.player = Player(self.key_handler)
-        self.player.set_position(32, 32)
+        self.player.set_position(128, 128)
 
         self.sprite_list.append(self.player)
 
+                # Map name
+        map_name = f":resources:tmx_maps/map2_level_1.tmx"
+
+        # Read in the tiled map
+        my_map = arcade.tilemap.read_tmx(map_name)
+
+        self.wall_list = arcade.tilemap.process_layer(map_object=my_map,
+                                                      layer_name="Platforms",
+                                                      scaling=.5,
+                                                      use_spatial_hash=True)
+
+        self.physics_engine = arcade.PhysicsEnginePlatformer(self.player,
+                                                             self.wall_list,
+                                                             1)
+
     def on_update(self, delta_time):
         self.sprite_list.update()
+        self.physics_engine.update()
 
         if self.key_handler.is_pressed("ZOOM_IN"):
             self.camera.zoom(self.zoom_speed)
@@ -52,6 +68,7 @@ class Window(arcade.Window):
         self.camera.set_viewport()
 
         self.sprite_list.draw()
+        self.wall_list.draw()
 
     def on_key_press(self, key, modifiers):
         self.key_handler.on_key_press(key, modifiers)
