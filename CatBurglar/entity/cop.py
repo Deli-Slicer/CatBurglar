@@ -35,8 +35,8 @@ class BaseCop(NamedAnimationsSprite):
 
     """
 
-    def __init__(self, default_animation="walk_right"):
-        super().__init__(animations=COP_TEXTURES, default_animation="walk_right")
+    def __init__(self, default_animation=WALK_RIGHT):
+        super().__init__(animations=COP_TEXTURES, default_animation=default_animation)
 
 
 class FakePatrollingCop(BaseCop):
@@ -49,7 +49,7 @@ class FakePatrollingCop(BaseCop):
 
     def __init__(
             self,
-            default_animation="walk_right",
+            default_animation=WALK_RIGHT,
             delay_between_reversals=3.0
     ):
         super().__init__(default_animation=default_animation)
@@ -62,7 +62,7 @@ class FakePatrollingCop(BaseCop):
             if self.current_animation_name == WALK_RIGHT:
                 self.current_animation_name = WALK_LEFT
             else:
-                self.current_animation_name == WALK_RIGHT
+                self.current_animation_name = WALK_RIGHT
             self.reverse_timer.remaining = self.delay_between_reversals
 
 
