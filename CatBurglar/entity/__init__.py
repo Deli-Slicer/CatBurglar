@@ -10,12 +10,21 @@ class NamedAnimationsSprite(Sprite):
 
     Animation support for multiple named states.
 
-    Expands upon some of the idea in AnimatedWalkingSprite by allowing an
-    arbitrary number of animations to be stored under string names.
+    It isn't only for Actors. Non-moving entities can use it too!
+    Coffee makers, ringing telephones, and many other items that would need to
+    move to attract the player's attention can use this!
 
-    This design is not final. There are a number of issues with it.
+    The design expands upon some of the ideas in AnimatedWalkingSprite by
+    allowing an arbitrary number of animations to be stored mapped to names,
+    aka strings.
+
+    !!! This design is not final !!!
+
+     There are a number of issues with it.
         1. Not sure if the current model of organizing animations makes sense,
-            ie is walk_left_0.png worthwhile? should there be more parts?
+            ie is walk_left_0.png worthwhile? should there be more parts to the name?
+            or should this baseclass only care about the state name and number, leaving
+            validation up to subclasses and helper methods?
 
         2. Animations might be better encapsulated as objects than they are now.
 
