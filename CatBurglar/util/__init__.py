@@ -56,7 +56,8 @@ class Timer:
         :param delta_time: how much to decrement remaining time by.
         :return:
         """
-        if self.running:
+        # don't try to update if no time is elapsing
+        if delta_time and self.running:
 
             # clamp minimum time to zero
             self._remaining = max(0.0, self._remaining - delta_time)
