@@ -1,5 +1,6 @@
 
 import arcade
+import pyglet.gl as gl
 
 from CatBurglar.input.KeyHandler import KeyHandler
 from CatBurglar.graphics.Camera import Camera
@@ -37,6 +38,32 @@ class Window(arcade.Window):
         self.player = Player(self.key_handler)
         self.player.set_position(32, 32)
 
+        import os
+
+        map_path = "./assets/map_files/tiles-as-objects.tmx"
+
+        tmx_map = arcade.tilemap.read_tmx(map_path)
+
+        self.wall_list = arcade.tilemap.process_layer(map_object=tmx_map,
+                                                      layer_name="tiles",
+                                                      scaling=1,
+                                                      use_spatial_hash=True)
+
+        cops_list = arcade.tilemap.process_layer(map_object=tmx_map,
+                                                      layer_name="cops",
+                                                      scaling=1,
+                                                      use_spatial_hash=True)
+
+        for cop_tile in cops_list:
+            cop = FakePatrollingCop()
+            cop.set_position(cop_tile.center_x, cop_tile.center_y)
+            self.sprite_list.append(cop)
+
+        self.physics_engine = arcade.PhysicsEnginePlatformer(self.player,
+                                                             self.wall_list,
+                                                             1)
+
+
         self.sprite_list.append(self.player)
 
         self.cop = FakePatrollingCop()
@@ -46,9 +73,9 @@ class Window(arcade.Window):
 
     def on_update(self, delta_time):
         self.sprite_list.update()
+        self.physics_engine.update()
 
         self.sprite_list.update_animation(delta_time=delta_time)
-
 
         if self.key_handler.is_pressed("ZOOM_IN"):
             self.camera.zoom(self.zoom_speed)
@@ -62,7 +89,9 @@ class Window(arcade.Window):
 
         self.camera.set_viewport()
 
-        self.sprite_list.draw()
+        self.sprite_list.draw(filter=gl.GL_NEAREST)
+
+        self.wall_list.draw(filter=gl.GL_NEAREST)
 
     def on_key_press(self, key, modifiers):
         self.key_handler.on_key_press(key, modifiers)

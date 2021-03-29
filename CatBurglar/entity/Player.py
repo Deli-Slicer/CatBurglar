@@ -37,5 +37,5 @@ class Player(arcade.SpriteSolidColor):
 
         if self.bottom < 0:
             self.bottom = 0
-        else:
-            self.change_y -= GRAVITY
+        # else:
+        #     self.change_y -= GRAVITY
