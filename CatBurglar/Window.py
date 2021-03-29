@@ -4,7 +4,7 @@ import arcade
 from CatBurglar.input.KeyHandler import KeyHandler
 from CatBurglar.graphics.Camera import Camera
 from CatBurglar.entity.Player import Player
-from CatBurglar.entity.cop import Cop
+from CatBurglar.entity.cop import FakePatrollingCop
 from CatBurglar.util import Timer
 
 WIDTH = 800
@@ -16,6 +16,7 @@ MIN_HEIGHT = 90
 TITLE = "Cat Burglar"
 
 RESIZABLE = True
+
 
 class Window(arcade.Window):
 
@@ -38,26 +39,14 @@ class Window(arcade.Window):
 
         self.sprite_list.append(self.player)
 
-        self.cop = Cop()
+        self.cop = FakePatrollingCop()
         self.cop.set_position(64, 32)
         self.sprite_list.append(self.cop)
 
-        self.cop_reverse_timer = Timer(remaining=3.0)
 
     def on_update(self, delta_time):
         self.sprite_list.update()
 
-        # very bad example of walking back and forth
-        self.cop_reverse_timer.update(delta_time)
-        if self.cop_reverse_timer.remaining <= delta_time:
-            if self.cop.current_animation_name == "walk_right":
-                self.cop.current_animation_name = "walk_left"
-            else:
-                self.cop.current_animation_name = "walk_right"
-            self.cop_reverse_timer.remaining = 3.0
-
-        # this needs to be called on any sprites that have updatable animations
-        # for the animation to progresss
         self.sprite_list.update_animation(delta_time=delta_time)
 
 
