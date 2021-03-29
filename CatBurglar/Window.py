@@ -4,6 +4,8 @@ import arcade
 from CatBurglar.input.KeyHandler import KeyHandler
 from CatBurglar.graphics.Camera import Camera
 from CatBurglar.entity.Player import Player
+from CatBurglar.entity.cop import FakePatrollingCop
+from CatBurglar.util import Timer
 
 WIDTH = 800
 HEIGHT = 450
@@ -14,6 +16,7 @@ MIN_HEIGHT = 90
 TITLE = "Cat Burglar"
 
 RESIZABLE = True
+
 
 class Window(arcade.Window):
 
@@ -32,28 +35,20 @@ class Window(arcade.Window):
         self.zoom_speed = .95
 
         self.player = Player(self.key_handler)
-        self.player.set_position(128, 128)
+        self.player.set_position(32, 32)
 
         self.sprite_list.append(self.player)
 
-                # Map name
-        map_name = f":resources:tmx_maps/map2_level_1.tmx"
+        self.cop = FakePatrollingCop()
+        self.cop.set_position(64, 32)
+        self.sprite_list.append(self.cop)
 
-        # Read in the tiled map
-        my_map = arcade.tilemap.read_tmx(map_name)
-
-        self.wall_list = arcade.tilemap.process_layer(map_object=my_map,
-                                                      layer_name="Platforms",
-                                                      scaling=.5,
-                                                      use_spatial_hash=True)
-
-        self.physics_engine = arcade.PhysicsEnginePlatformer(self.player,
-                                                             self.wall_list,
-                                                             1)
 
     def on_update(self, delta_time):
         self.sprite_list.update()
-        self.physics_engine.update()
+
+        self.sprite_list.update_animation(delta_time=delta_time)
+
 
         if self.key_handler.is_pressed("ZOOM_IN"):
             self.camera.zoom(self.zoom_speed)
@@ -68,7 +63,6 @@ class Window(arcade.Window):
         self.camera.set_viewport()
 
         self.sprite_list.draw()
-        self.wall_list.draw()
 
     def on_key_press(self, key, modifiers):
         self.key_handler.on_key_press(key, modifiers)
