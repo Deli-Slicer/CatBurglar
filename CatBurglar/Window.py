@@ -4,6 +4,8 @@ import arcade
 from CatBurglar.input.KeyHandler import KeyHandler
 from CatBurglar.graphics.Camera import Camera
 from CatBurglar.entity.Player import Player
+from CatBurglar.entity.cop import FakePatrollingCop
+from CatBurglar.util import Timer
 
 WIDTH = 800
 HEIGHT = 450
@@ -14,6 +16,7 @@ MIN_HEIGHT = 90
 TITLE = "Cat Burglar"
 
 RESIZABLE = True
+
 
 class Window(arcade.Window):
 
@@ -36,8 +39,16 @@ class Window(arcade.Window):
 
         self.sprite_list.append(self.player)
 
+        self.cop = FakePatrollingCop()
+        self.cop.set_position(64, 32)
+        self.sprite_list.append(self.cop)
+
+
     def on_update(self, delta_time):
         self.sprite_list.update()
+
+        self.sprite_list.update_animation(delta_time=delta_time)
+
 
         if self.key_handler.is_pressed("ZOOM_IN"):
             self.camera.zoom(self.zoom_speed)
