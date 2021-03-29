@@ -1,5 +1,6 @@
 
 import arcade
+from pyglet.gl import gl
 
 from CatBurglar.input.KeyHandler import KeyHandler
 from CatBurglar.graphics.Camera import Camera
@@ -62,7 +63,7 @@ class Window(arcade.Window):
 
         self.camera.set_viewport()
 
-        self.sprite_list.draw()
+        self.sprite_list.draw(filter=gl.GL_NEAREST)
 
     def on_key_press(self, key, modifiers):
         self.key_handler.on_key_press(key, modifiers)
