@@ -10,11 +10,11 @@ from CatBurglar.util.asset_loading import ASSET_BASE_PATH
 
 COP_TEXTURES = {}
 
-for anim_root in ['default', 'walk']:
+for anim_root in ['still', 'walk']:
     for direction in ['left', 'right']:
         template_str = f"{anim_root}_{direction}"
         itercieling = 4
-        if anim_root == 'default':
+        if anim_root == 'still':
             itercieling = 1
 
         if template_str not in COP_TEXTURES:
