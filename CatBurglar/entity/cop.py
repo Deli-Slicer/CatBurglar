@@ -1,4 +1,4 @@
-from CatBurglar.entity import NamedAnimationsSprite, WALK_RIGHT, WALK_LEFT, REQUIRED_FOR_ACTORS
+from CatBurglar.entity import NamedAnimationsSprite, WALK_RIGHT, WALK_LEFT, REQUIRED_FOR_ACTORS, Actor
 from CatBurglar.util import Timer
 from CatBurglar.util.asset_loading import ASSET_BASE_PATH, preload_entity_texture_table
 
@@ -6,7 +6,7 @@ COP_PATH = ASSET_BASE_PATH / "cop"
 
 COP_TEXTURES = preload_entity_texture_table(COP_PATH, REQUIRED_FOR_ACTORS)
 
-class BaseCop(NamedAnimationsSprite):
+class BaseCop(Actor):
     """
 
     Temporary cop test asset for moving animations.

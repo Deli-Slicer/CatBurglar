@@ -194,3 +194,4 @@ class Actor(NamedAnimationsSprite):
             current_animation_name=current_animation_name,
             frame_length=frame_length
         )
+
