@@ -1,7 +1,6 @@
-from CatBurglar.entity import NamedAnimationsSprite, WALK_RIGHT, WALK_LEFT, preload_entity_texture_table, \
-    REQUIRED_FOR_ACTORS
+from CatBurglar.entity import NamedAnimationsSprite, WALK_RIGHT, WALK_LEFT, REQUIRED_FOR_ACTORS
 from CatBurglar.util import Timer
-from CatBurglar.util.asset_loading import ASSET_BASE_PATH
+from CatBurglar.util.asset_loading import ASSET_BASE_PATH, preload_entity_texture_table
 
 COP_PATH = ASSET_BASE_PATH / "cop"
 

@@ -15,7 +15,7 @@ from collections import defaultdict
 from pathlib import Path
 
 # Python seems to start searching for assets from the current run directory
-from typing import Union, List, Callable, Dict, Any
+from typing import Union, List, Callable, Dict, Any, Iterable
 
 # Python loads from the root of the current run directory, so if assets are at
 # the same directory as main.py, this will be helpful to have cached.
@@ -64,12 +64,14 @@ def validate_path_and_fetch_child_files(path: Union[Path, str]) -> List[Path]:
 
     return processing_list
 
+
 class AssetGroupError(Exception):
     """
     For problems loading files other than corrupted or non-accessible files.
     """
     def __init__(self, message: str, subgroup: str):
         self.message = message
+        self.subgroup = subgroup
         super().__init__(message)
 
 
@@ -87,6 +89,14 @@ class MissingSequenceMember(AssetGroupError):
         super(MissingSequenceMember, self).__init__(message, subgroup)
         self.last_good_index = last_good_index
         self.bad = bad
+
+
+class MissingSubgroup(AssetGroupError):
+    """
+    When a subgroup was expected but isn't found
+    """
+    def __init__(self, message: str, subgroup: str):
+        super().__init__(message, subgroup)
 
 
 def load_asset_group(
@@ -134,7 +144,7 @@ def load_asset_group(
 
     # the integer keys will be used to create a sorted version of the list
     # that will be stored in the final output dict.
-    final_output_dict = defaultdict(list)
+    final_ordering = defaultdict(list)
 
     # prep the filenames in unsorted order
     for file in source:
@@ -187,10 +197,32 @@ def load_asset_group(
 
             # attempt loading the asset
             asset = asset_loader(unsorted_entries[index])
-            final_output_dict[subgroup_name].append(asset)
+            final_ordering[subgroup_name].append(asset)
 
     # "freeze" output so it stops generating subgroup sequences
-    return dict(final_output_dict)
+    return dict(final_ordering)
 
 
+def preload_entity_texture_table(
+        path: Union[Path, str],
+        required_state_subgroups: Iterable[str]
+) -> Dict[str, List[Texture]]:
+    """
+    Convenience method around load_asset_group for loading textures.
 
+    Will Raise an AssetError if
+
+    :param path: a path to load textures from
+    :param required_state_subgroups: list of subgroups to ensure
+    :return:
+    """
+
+    output = load_asset_group(
+        path,
+        load_texture
+    )
+    for state in required_state_subgroups:
+        if state not in output:
+            raise MissingSubgroup(f"Missing subgroup member r{state}", state)
+
+    return output

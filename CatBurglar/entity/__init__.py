@@ -8,15 +8,13 @@ This includes the following:
     - Actor, the baseclass for mobile and other game entities
 
 """
-from pathlib import Path
-from typing import DefaultDict, List, Dict, Union, Iterable
+from typing import DefaultDict, List, Dict
 from collections import defaultdict
-from arcade import Texture, load_texture
+from arcade import Texture
 from arcade import Sprite
 from arcade import SpriteList
 
 from CatBurglar.util import Timer
-from CatBurglar.util.asset_loading import load_asset_group
 
 """
 
@@ -47,29 +45,6 @@ REQUIRED_FOR_ACTORS = [
 # optional still states, intended to be used for NPC actors
 STILL_FACINGCAMERA = "still_facing"
 STILL_AWAYCAMERA = "still_awaycamera"
-
-
-def preload_entity_texture_table(
-        path: Union[Path, str],
-        required_state_subgroups: Iterable[str]
-) -> Dict[str, List[Texture]]:
-    """
-    Convenience method around load_asset_group for loading textures.
-
-    :param path: a path to load textures from
-    :param required_state_subgroups: list of subgroups to ensure
-    :return:
-    """
-
-    output = load_asset_group(
-        path,
-        load_texture
-    )
-    for state in required_state_subgroups:
-        if state not in output:
-            raise KeyError(f"Missing animation sequence asset subgroup r{state}")
-
-    return output
 
 
 class NamedAnimationsSprite(Sprite):
