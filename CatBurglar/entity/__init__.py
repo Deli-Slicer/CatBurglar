@@ -92,8 +92,7 @@ class NamedAnimationsSprite(Sprite):
         if self._current_animation_name != new_animation_name:
             self._current_animation_name = new_animation_name
             self.current_animation_frames = self.animations[new_animation_name]
-
-        self.reset_animation_to_start()
+            self.reset_animation_to_start()
 
     @property
     def animation_expiring(self) -> bool:
