@@ -183,13 +183,20 @@ class Actor(NamedAnimationsSprite):
 
     """
 
+    @property
+    def moving(self) -> bool:
+        return self._moving
+
     def __init__(
             self,
             animations: AnimationStateDict = None,
             default_animation: str = STILL_RIGHT,
             current_animation_name: str = None,
-            frame_length: float = 1 / 12
+            frame_length: float = 1 / 12,
+            stillness_threshold: float = 0.5
     ):
+        # used for movement detection
+        self._moving = True
 
         # may be used in the future to hold sensors, non-drawn collision hulls used
         # for hitscanning and proximity detection?
@@ -202,4 +209,14 @@ class Actor(NamedAnimationsSprite):
             current_animation_name=current_animation_name,
             frame_length=frame_length
         )
+
+    def update(self):
+        if abs(self.change_x) > 0.1 and not self.moving:
+            self._moving = True
+
+        elif abs(self.change_x) <= 0.1 and self.moving:
+            self._moving = False
+
+
+
 

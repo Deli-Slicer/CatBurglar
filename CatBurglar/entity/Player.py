@@ -1,4 +1,4 @@
-from CatBurglar.entity import REQUIRED_FOR_ACTORS, Actor
+from CatBurglar.entity import REQUIRED_FOR_ACTORS, Actor, WALK_LEFT, WALK_RIGHT, STILL_RIGHT, STILL_LEFT
 from CatBurglar.util.asset_loading import ASSET_BASE_PATH, preload_entity_texture_table
 
 GORILLA_SPRITE_PATH = ASSET_BASE_PATH / "gorilla"
@@ -9,6 +9,7 @@ GORILLA_TEXTURES = preload_entity_texture_table(
 )
 
 GRAVITY = 1
+
 
 class Player(Actor):
 
@@ -28,17 +29,28 @@ class Player(Actor):
         
         if self.key_handler.is_pressed("LEFT"):
             self.change_x -= self.move_speed
+            self.current_animation_name = WALK_LEFT
 
-        if self.key_handler.is_pressed("RIGHT"):
+        elif self.key_handler.is_pressed("RIGHT"):
             self.change_x += self.move_speed
+            self.current_animation_name = WALK_RIGHT
 
         if self.key_handler.is_pressed("UP"):
             self.change_y += self.jump_speed
 
-        if self.key_handler.is_pressed("DOWN"):
+        elif self.key_handler.is_pressed("DOWN"):
             self.change_y -= self.move_speed
 
+        # if we're below movement threshold but haven't updated
+        # then set our still direction
+        if self.moving and abs(self.change_x) <= 0.1:
+            if self.current_animation_name == WALK_LEFT:
+                self.current_animation_name = STILL_LEFT
+            else:
+                self.current_animation_name = STILL_RIGHT
+
         super().update()
+
 
         if self.bottom < 0:
             self.bottom = 0
