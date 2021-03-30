@@ -1,4 +1,4 @@
-from CatBurglar.entity import NamedAnimationsSprite, WALK_RIGHT, WALK_LEFT, REQUIRED_FOR_ACTORS, Actor
+from CatBurglar.entity import WALK_RIGHT, WALK_LEFT, REQUIRED_FOR_ACTORS, Actor
 from CatBurglar.util import Timer
 from CatBurglar.util.asset_loading import ASSET_BASE_PATH, preload_entity_texture_table
 

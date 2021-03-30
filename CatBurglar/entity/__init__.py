@@ -122,7 +122,7 @@ class NamedAnimationsSprite(Sprite):
         self.animations: AnimationStateDict = defaultdict(list)
 
         if animations:
-            self.animations.update(animations)
+            self.animations = animations
 
         self.frame_timer = Timer()
 

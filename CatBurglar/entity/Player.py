@@ -1,15 +1,20 @@
+from CatBurglar.entity import REQUIRED_FOR_ACTORS, Actor
+from CatBurglar.util.asset_loading import ASSET_BASE_PATH, preload_entity_texture_table
 
-import arcade
+GORILLA_SPRITE_PATH = ASSET_BASE_PATH / "gorilla"
 
-PLAYER_WIDTH = 16
-PLAYER_HEIGHT = 32
+GORILLA_TEXTURES = preload_entity_texture_table(
+    GORILLA_SPRITE_PATH,
+    REQUIRED_FOR_ACTORS
+)
 
 GRAVITY = 1
 
-class Player(arcade.SpriteSolidColor):
+class Player(Actor):
 
     def __init__(self, key_handler):
-        super().__init__(PLAYER_WIDTH, PLAYER_HEIGHT, arcade.color.AQUA)
+        super().__init__(
+           animations=GORILLA_TEXTURES)
 
         self.key_handler = key_handler
 
