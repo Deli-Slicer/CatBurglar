@@ -1,7 +1,6 @@
 from arcade import load_texture
 
-from CatBurglar.entity import NamedAnimationsSprite
-from CatBurglar.entity.actor import WALK_RIGHT, WALK_LEFT
+from CatBurglar.entity import NamedAnimationsSprite, WALK_RIGHT, WALK_LEFT
 from CatBurglar.util import Timer
 from CatBurglar.util.asset_loading import ASSET_BASE_PATH
 

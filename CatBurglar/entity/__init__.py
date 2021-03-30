@@ -1,8 +1,42 @@
+"""
+
+Base classes for entities and animation as well as supporting constants.
+
+This includes the following:
+    - NamedAnimatedSprite, the base stateful animated sprite
+    - State constants that represent common states used by multiple entities
+    - Actor, the baseclass for mobile and other game entities
+
+"""
 from typing import DefaultDict, List, Dict
 from collections import defaultdict
 from arcade import Texture
 from arcade import Sprite
+
 from CatBurglar.util import Timer
+
+"""
+
+Common animation state constants
+
+All mobile actors are expected to have entries for these in the state maps
+for their class. Attempting to instantiate, and maybe even run the definition
+of, a mobile actor that doesn't have these in the state map should return an
+error.
+
+"""
+
+# Default non-moving animation states for actors
+STILL_RIGHT = "still_right"
+STILL_LEFT = "still_left"
+
+# optional still states, intended to be used for NPC actors
+STILL_FACINGCAMERA = "still_facing"
+STILL_AWAYCAMERA = "still_awaycamera"
+
+# Animation state names that all motile actors are expected to have
+WALK_RIGHT = "walk_right"
+WALK_LEFT = "walk_left"
 
 
 class NamedAnimationsSprite(Sprite):
@@ -61,7 +95,7 @@ class NamedAnimationsSprite(Sprite):
     def __init__(
             self,
             animations: Dict[str, List[Texture]] = None,
-            default_animation: str = "default_right",
+            default_animation: str = STILL_RIGHT,
             current_animation_name: str = None,
             frame_length: float = 1 / 12
     ):
@@ -125,3 +159,19 @@ class NamedAnimationsSprite(Sprite):
         # otherwise set the current texture
         self.texture = self.current_animation_frames[next_frame_index]
 
+
+
+class Actor(NamedAnimationsSprite):
+    """
+    Baseclass for mobile or otherwise active entities
+
+
+    """
+
+    def __init__(self):
+
+        # may be used to hold sensors, non-drawn collision hulls used for things like hitscanning
+#        self.sensors_by_name = {}
+#        self.sensor_list = SpriteList()
+
+        super().__init__()
