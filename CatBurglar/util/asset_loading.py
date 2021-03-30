@@ -52,6 +52,7 @@ def validate_path_and_fetch_child_files(path: Union[Path, str]) -> List[Path]:
     if convenient_path.is_file():
         processing_list.append(convenient_path)
 
+    # fetch all file children
     elif convenient_path.is_dir():
         for child in convenient_path.iterdir():
             if child.is_file():
@@ -62,6 +63,30 @@ def validate_path_and_fetch_child_files(path: Union[Path, str]) -> List[Path]:
         raise ValueError("Path exists but is somehow neither a file or a directory")
 
     return processing_list
+
+class AssetGroupError(Exception):
+    """
+    For problems loading files other than corrupted or non-accessible files.
+    """
+    def __init__(self, message: str, subgroup: str):
+        self.message = message
+        super().__init__(message)
+
+
+class MissingSequenceMember(AssetGroupError):
+    """
+    When there is a missing asset in a sequence
+    """
+    def __init__(
+            self,
+            message: str,
+            subgroup: str,
+            last_good_index: int,
+            bad: int
+    ):
+        super(MissingSequenceMember, self).__init__(message, subgroup)
+        self.last_good_index = last_good_index
+        self.bad = bad
 
 
 def load_asset_group(
@@ -140,7 +165,25 @@ def load_asset_group(
     for subgroup_name, unsorted_entries in temp_subgroup_dict.items():
 
         # iterate through keys in now-sorted order and attempt to load asset
+        previous = -1
+
         for index in sorted(unsorted_entries.keys()):
+            if previous != index - 1:
+                message =\
+                    f"Malformed asset sequence for subgroup {subgroup_name!r}:"\
+                    f" sequence break between index {previous!r} and {index!r}"
+
+                if exception_on_unexpected_filename:
+                    raise MissingSequenceMember(
+                        message,
+                        subgroup_name,
+                        previous,
+                        index
+                    )
+                else:
+                    LOG.warning(message)
+
+            previous = index
 
             # attempt loading the asset
             asset = asset_loader(unsorted_entries[index])
