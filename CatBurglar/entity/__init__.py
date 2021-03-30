@@ -78,17 +78,22 @@ class NamedAnimationsSprite(Sprite):
 
     """
 
+    def reset_animation_to_start(self):
+        self.current_animation_frame_index = 0
+        self.frame_timer.remaining = self.frame_length
+        self.update_animation(0.0)
+
     @property
     def current_animation_name(self):
         return self._current_animation_name
 
     @current_animation_name.setter
     def current_animation_name(self, new_animation_name: str) -> str:
-        self._current_animation_name = new_animation_name
-        self.current_animation_frame_index = 0
-        self.frame_timer.remaining = self.frame_length
-        self.current_animation_frames = self.animations[new_animation_name]
-        self.update_animation(0.0)
+        if self._current_animation_name != new_animation_name:
+            self._current_animation_name = new_animation_name
+            self.current_animation_frames = self.animations[new_animation_name]
+
+        self.reset_animation_to_start()
 
     @property
     def animation_expiring(self) -> bool:
@@ -127,7 +132,10 @@ class NamedAnimationsSprite(Sprite):
         self.frame_timer = Timer()
 
         self.frame_length: float = frame_length
+        self.current_animation_frame_index = 0
         self.default_animation: str = default_animation
+
+        self._current_animation_name = None
         self.current_animation_name: str =\
             current_animation_name or default_animation
 
