@@ -7,13 +7,15 @@ import errno
 import os
 import logging
 
+from arcade import Texture, load_texture
+
 LOG = logging.getLogger('arcade')
 
 from collections import defaultdict
 from pathlib import Path
 
 # Python seems to start searching for assets from the current run directory
-from typing import Union, DefaultDict, List, Callable
+from typing import Union, List, Callable, Dict, Any
 
 # Python loads from the root of the current run directory, so if assets are at
 # the same directory as main.py, this will be helpful to have cached.
@@ -23,7 +25,6 @@ ASSET_BASE_PATH = Path.cwd() / "assets"
 SPRITE_FORMAT_REGEX_STRING = r"([A-Za-z0-9\-]+_([A-Za-z0-9\-]+))\_[0-9]+\.png"
 
 ASSET_FILENAME_END_REGEX = re.compile(r"_([0-9]+)\.([a-zA-Z]+)$")
-
 
 
 def validate_path_and_fetch_child_files(path: Union[Path, str]) -> List[Path]:
@@ -68,7 +69,7 @@ def load_asset_group(
         asset_loader: Callable,
         ignore_other_than: re.Pattern = None,
         exception_on_unexpected_filename: bool = True
-) -> DefaultDict[str, List[str]]:
+) -> Dict[str, List[Any]]:
     """
 
     Load files to a dict of subgroup names -> lists of asset sequences.
@@ -145,6 +146,8 @@ def load_asset_group(
             asset = asset_loader(unsorted_entries[index])
             final_output_dict[subgroup_name].append(asset)
 
-    return final_output_dict
+    # "freeze" output so it stops generating subgroup sequences
+    return dict(final_output_dict)
+
 
 

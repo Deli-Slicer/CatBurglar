@@ -8,12 +8,15 @@ This includes the following:
     - Actor, the baseclass for mobile and other game entities
 
 """
-from typing import DefaultDict, List, Dict
+from pathlib import Path
+from typing import DefaultDict, List, Dict, Union, Iterable
 from collections import defaultdict
-from arcade import Texture
+from arcade import Texture, load_texture
 from arcade import Sprite
+from arcade import SpriteList
 
 from CatBurglar.util import Timer
+from CatBurglar.util.asset_loading import load_asset_group
 
 """
 
@@ -30,13 +33,43 @@ error.
 STILL_RIGHT = "still_right"
 STILL_LEFT = "still_left"
 
+# Walking states
+WALK_RIGHT = "walk_right"
+WALK_LEFT = "walk_left"
+
+REQUIRED_FOR_ACTORS = [
+    STILL_RIGHT,
+    STILL_LEFT,
+    WALK_RIGHT,
+    WALK_LEFT
+]
+
 # optional still states, intended to be used for NPC actors
 STILL_FACINGCAMERA = "still_facing"
 STILL_AWAYCAMERA = "still_awaycamera"
 
-# Animation state names that all motile actors are expected to have
-WALK_RIGHT = "walk_right"
-WALK_LEFT = "walk_left"
+
+def preload_entity_texture_table(
+        path: Union[Path, str],
+        required_state_subgroups: Iterable[str]
+) -> Dict[str, List[Texture]]:
+    """
+    Convenience method around load_asset_group for loading textures.
+
+    :param path: a path to load textures from
+    :param required_state_subgroups: list of subgroups to ensure
+    :return:
+    """
+
+    output = load_asset_group(
+        path,
+        load_texture
+    )
+    for state in required_state_subgroups:
+        if state not in output:
+            raise KeyError(f"Missing animation sequence asset subgroup r{state}")
+
+    return output
 
 
 class NamedAnimationsSprite(Sprite):
@@ -165,13 +198,12 @@ class Actor(NamedAnimationsSprite):
     """
     Baseclass for mobile or otherwise active entities
 
-
     """
 
     def __init__(self):
 
         # may be used to hold sensors, non-drawn collision hulls used for things like hitscanning
-#        self.sensors_by_name = {}
-#        self.sensor_list = SpriteList()
+        self.sensors_by_name = {}
+        self.sensor_list = SpriteList()
 
         super().__init__()
