@@ -1,29 +1,30 @@
 """
-A grab bag of asset loading utilities. These can be moved later if we find a
-better place to keep them.
+Asset loading type shorthands, constants, and assistance functions.
 """
-import re
 import errno
 import os
+import re
 import logging
-
+from collections import defaultdict
+from pathlib import Path
 from arcade import Texture, load_texture
+from typing import Union, List, Callable, Dict, Any, Iterable, Mapping
 
 LOG = logging.getLogger('arcade')
 
-from collections import defaultdict
-from pathlib import Path
+# Describes anything that maps strings to lists of textures. Used
+# elsewhere in the project as well.
+AnimationStateDict = Mapping[str, List[Texture]]
 
-# Python seems to start searching for assets from the current run directory
-from typing import Union, List, Callable, Dict, Any, Iterable
-
-# Python loads from the root of the current run directory, so if assets are at
-# the same directory as main.py, this will be helpful to have cached.
+# Python loads from the root of the current run directory, so if assets
+# are at the root of the project, this will be helpful to have cached.
 ASSET_BASE_PATH = Path.cwd() / "assets"
 
-# matches files of formats like walk_left_0.png. Not currently used but may be.
+# matches files of formats like walk_left_0.png. Not currently used
+# but can be passed to one of the functions below that takes regexes.
 SPRITE_FORMAT_REGEX_STRING = r"([A-Za-z0-9\-]+_([A-Za-z0-9\-]+))\_[0-9]+\.png"
 
+# helps check sequence formation for animations and other sequences
 ASSET_FILENAME_END_REGEX = re.compile(r"_([0-9]+)\.([a-zA-Z]+)$")
 
 
@@ -210,7 +211,7 @@ def preload_entity_texture_table(
     """
     Convenience method around load_asset_group for loading textures.
 
-    Will Raise an AssetError if
+    Will Raise an AssetError if a state passed as required is missing.
 
     :param path: a path to load textures from
     :param required_state_subgroups: list of subgroups to ensure
@@ -223,6 +224,7 @@ def preload_entity_texture_table(
     )
     for state in required_state_subgroups:
         if state not in output:
-            raise MissingSubgroup(f"Missing subgroup member r{state}", state)
+            raise MissingSubgroup(f"Missing subgroup member: {state!r} in {path!r}", state)
 
     return output
+

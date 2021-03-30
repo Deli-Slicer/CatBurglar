@@ -8,13 +8,14 @@ This includes the following:
     - Actor, the baseclass for mobile and other game entities
 
 """
-from typing import DefaultDict, List, Dict
 from collections import defaultdict
-from arcade import Texture
 from arcade import Sprite
 from arcade import SpriteList
 
 from CatBurglar.util import Timer
+# Typing annotation that describes a generic mapping
+# froms string to list of textures.
+from CatBurglar.util.asset_loading import AnimationStateDict
 
 """
 
@@ -102,7 +103,7 @@ class NamedAnimationsSprite(Sprite):
 
     def __init__(
             self,
-            animations: Dict[str, List[Texture]] = None,
+            animations: AnimationStateDict = None,
             default_animation: str = STILL_RIGHT,
             current_animation_name: str = None,
             frame_length: float = 1 / 12
@@ -118,7 +119,7 @@ class NamedAnimationsSprite(Sprite):
         """
         super().__init__()
 
-        self.animations: DefaultDict[str, List[Texture]] = defaultdict(list)
+        self.animations: AnimationStateDict = defaultdict(list)
 
         if animations:
             self.animations.update(animations)
@@ -168,17 +169,28 @@ class NamedAnimationsSprite(Sprite):
         self.texture = self.current_animation_frames[next_frame_index]
 
 
-
 class Actor(NamedAnimationsSprite):
     """
     Baseclass for mobile or otherwise active entities
 
     """
 
-    def __init__(self):
+    def __init__(
+            self,
+            animations: AnimationStateDict = None,
+            default_animation: str = STILL_RIGHT,
+            current_animation_name: str = None,
+            frame_length: float = 1 / 12
+    ):
 
-        # may be used to hold sensors, non-drawn collision hulls used for things like hitscanning
+        # may be used in the future to hold sensors, non-drawn collision hulls used
+        # for hitscanning and proximity detection?
         self.sensors_by_name = {}
         self.sensor_list = SpriteList()
 
-        super().__init__()
+        super().__init__(
+            animations=animations,
+            default_animation=default_animation,
+            current_animation_name=current_animation_name,
+            frame_length=frame_length
+        )
