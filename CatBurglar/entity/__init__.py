@@ -100,6 +100,8 @@ class NamedAnimationsSprite(Sprite):
         :param delta_time:
         :return:
         """
+
+
         frame_timer: Timer = self.frame_timer
 
         frame_timer.update(delta_time)
@@ -109,11 +111,15 @@ class NamedAnimationsSprite(Sprite):
 
         # update the current animation frame if the timer has run out
         if frame_timer.remaining == 0.0:
-            next_frame_index += 1
-            if next_frame_index >= len(self.current_animation_frames):
-                next_frame_index = 0
 
-            self.current_animation_frame_index = next_frame_index
+            # only update frames if there's more than one frame
+            if len(self.current_animation_frames) > 1:
+                next_frame_index += 1
+                if next_frame_index >= len(self.current_animation_frames):
+                    next_frame_index = 0
+
+                self.current_animation_frame_index = next_frame_index
+
             self.frame_timer.remaining = self.frame_length
 
         # otherwise set the current texture
