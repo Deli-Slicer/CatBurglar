@@ -1,10 +1,13 @@
 from CatBurglar.entity import WALK_RIGHT, WALK_LEFT, REQUIRED_FOR_ACTORS, Actor
 from CatBurglar.util import Timer
-from CatBurglar.util.asset_loading import ASSET_BASE_PATH, preload_entity_texture_table
+from CatBurglar.util.asset_loading import ASSET_BASE_PATH, preload_entity_texture_table, \
+    preload_entity_texture_alt_skin_table
 
 COP_PATH = ASSET_BASE_PATH / "cop"
 
-COP_TEXTURES = preload_entity_texture_table(COP_PATH, REQUIRED_FOR_ACTORS)
+COP_ALT_TABLE = preload_entity_texture_alt_skin_table(
+    COP_PATH, REQUIRED_FOR_ACTORS
+)
 
 class BaseCop(Actor):
     """
@@ -14,7 +17,11 @@ class BaseCop(Actor):
     """
 
     def __init__(self, default_animation=WALK_RIGHT):
-        super().__init__(animations=COP_TEXTURES, default_animation=default_animation)
+        super().__init__(
+            animations=None,
+            alt_table=COP_ALT_TABLE,
+            default_animation=default_animation
+        )
 
 
 class FakePatrollingCop(BaseCop):

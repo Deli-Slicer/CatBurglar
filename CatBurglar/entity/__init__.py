@@ -9,6 +9,9 @@ This includes the following:
 
 """
 from collections import defaultdict
+from random import choice
+from typing import List
+
 from arcade import Sprite
 from arcade import SpriteList
 
@@ -108,6 +111,7 @@ class NamedAnimationsSprite(Sprite):
     def __init__(
             self,
             animations: AnimationStateDict = None,
+            alt_table: List[AnimationStateDict] = None,
             default_animation: str = STILL_RIGHT,
             current_animation_name: str = None,
             frame_length: float = 1 / 12
@@ -117,16 +121,24 @@ class NamedAnimationsSprite(Sprite):
         Build a stateful animated sprite.
 
         :param animations: a dict mapping strings to lists of frames
+        :param alt_table: a list of animation dicts to choose from
         :param default_animation: which animation will be displayed first
         :param current_animation_name: the name of the current animation
         :param frame_length: how long frames should be displayed for
         """
         super().__init__()
 
-        self.animations: AnimationStateDict = defaultdict(list)
+        self.animations: AnimationStateDict = {}
 
         if animations:
             self.animations = animations
+        elif alt_table:
+            self.animations = choice(alt_table)
+        else:
+            raise ValueError(
+                "One of the following must be passed:"\
+                " an animation atlas or alt table of atlases"
+            )
 
         self.frame_timer = Timer()
 
@@ -137,7 +149,6 @@ class NamedAnimationsSprite(Sprite):
         self._current_animation_name = None
         self.current_animation_name: str =\
             current_animation_name or default_animation
-
 
     def update_animation(self, delta_time: float = 1/60):
         """
@@ -189,11 +200,20 @@ class Actor(NamedAnimationsSprite):
     def __init__(
             self,
             animations: AnimationStateDict = None,
+            alt_table: List[AnimationStateDict] = None,
             default_animation: str = STILL_RIGHT,
             current_animation_name: str = None,
             frame_length: float = 1 / 12,
             stillness_threshold: float = 0.5
     ):
+        """
+
+        :param animations: a dict mapping strings to lists of frames
+        :param alt_table: a list of animation dicts to choose from
+        :param default_animation: which animation will be displayed first
+        :param current_animation_name: the name of the current animation
+        :param frame_length: how long frames should be displayed for
+         """
         # used for movement detection
         self._moving = True
 
@@ -204,6 +224,7 @@ class Actor(NamedAnimationsSprite):
 
         super().__init__(
             animations=animations,
+            alt_table=alt_table,
             default_animation=default_animation,
             current_animation_name=current_animation_name,
             frame_length=frame_length

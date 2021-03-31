@@ -28,7 +28,11 @@ SPRITE_FORMAT_REGEX_STRING = r"([A-Za-z0-9\-]+_([A-Za-z0-9\-]+))\_[0-9]+\.png"
 ASSET_FILENAME_END_REGEX = re.compile(r"_([0-9]+)\.([a-zA-Z]+)$")
 
 
-def validate_path_and_fetch_child_files(path: Union[Path, str]) -> List[Path]:
+def validate_path_and_fetch_children(
+        path: Union[Path, str],
+        ignore_files: bool = False,
+        ignore_dirs: bool = True
+) -> List[Path]:
     """
 
     Validate a path as an existing file or folder, then return a list
@@ -56,7 +60,9 @@ def validate_path_and_fetch_child_files(path: Union[Path, str]) -> List[Path]:
     # fetch all file children
     elif convenient_path.is_dir():
         for child in convenient_path.iterdir():
-            if child.is_file():
+            if child.is_file() and not ignore_files:
+                processing_list.append(child)
+            elif child.is_dir() and not ignore_dirs:
                 processing_list.append(child)
     else:
         # I don't know of any condition where this could happen but we'll
@@ -137,7 +143,7 @@ def load_asset_group(
     # it later somehow.
 
     # make sure this isn't an invalid path
-    source = validate_path_and_fetch_child_files(raw_source)
+    source = validate_path_and_fetch_children(raw_source)
 
     # temp_subgroup_dict will store Dict[str, Dict[int, Path]] with the
     # sequence index mapping to the path for the file.
@@ -203,11 +209,10 @@ def load_asset_group(
     # "freeze" output so it stops generating subgroup sequences
     return dict(final_ordering)
 
-
 def preload_entity_texture_table(
         path: Union[Path, str],
         required_state_subgroups: Iterable[str]
-) -> Dict[str, List[Texture]]:
+) -> AnimationStateDict:
     """
     Convenience method around load_asset_group for loading textures.
 
@@ -227,4 +232,31 @@ def preload_entity_texture_table(
             raise MissingSubgroup(f"Missing subgroup member: {state!r} in {path!r}", state)
 
     return output
+
+
+def preload_entity_texture_alt_skin_table(
+    alt_skins_root: Union[Path, str],
+    required_state_subgroups: Iterable[str]
+) -> List[AnimationStateDict]:
+    """
+    Load multiple versiobns of an alt skin table that are stored in subdirs
+
+    :param alt_skins_root:
+    :param required_state_subgroups:
+    :return:
+    """
+    skin_dirs = validate_path_and_fetch_children(
+        alt_skins_root,
+        ignore_files=True,
+        ignore_dirs=False
+    )
+
+    alt_skin_table = []
+    for skin_dir in skin_dirs:
+        alt_skin_table.append(preload_entity_texture_table(
+            skin_dir,
+            required_state_subgroups
+        ))
+
+    return alt_skin_table
 
