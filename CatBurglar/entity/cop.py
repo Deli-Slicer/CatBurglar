@@ -1,34 +1,15 @@
-from arcade import load_texture
-
-from CatBurglar.entity import NamedAnimationsSprite
-from CatBurglar.entity.actor import WALK_RIGHT, WALK_LEFT
+from CatBurglar.entity import WALK_RIGHT, WALK_LEFT, REQUIRED_FOR_ACTORS, Actor
 from CatBurglar.util import Timer
-from CatBurglar.util.asset_loading import ASSET_BASE_PATH
+from CatBurglar.util.asset_loading import ASSET_BASE_PATH, preload_entity_texture_table, \
+    preload_entity_texture_alt_skin_table
 
+COP_PATH = ASSET_BASE_PATH / "cop"
 
-#!!! horrible kludge that should be replaced with proper asset loading helpers
+COP_ALT_TABLE = preload_entity_texture_alt_skin_table(
+    COP_PATH, REQUIRED_FOR_ACTORS
+)
 
-COP_TEXTURES = {}
-
-for anim_root in ['still', 'walk']:
-    for direction in ['left', 'right']:
-        template_str = f"{anim_root}_{direction}"
-        itercieling = 4
-        if anim_root == 'still':
-            itercieling = 1
-
-        if template_str not in COP_TEXTURES:
-            COP_TEXTURES[template_str] = []
-
-        for index in range(0, itercieling):
-            COP_TEXTURES[template_str].append(
-                load_texture(ASSET_BASE_PATH / f"cop/{template_str}_{index}.png")
-            )
-
-#!!! end horrible kludge
-
-
-class BaseCop(NamedAnimationsSprite):
+class BaseCop(Actor):
     """
 
     Temporary cop test asset for moving animations.
@@ -36,7 +17,11 @@ class BaseCop(NamedAnimationsSprite):
     """
 
     def __init__(self, default_animation=WALK_RIGHT):
-        super().__init__(animations=COP_TEXTURES, default_animation=default_animation)
+        super().__init__(
+            animations=None,
+            alt_table=COP_ALT_TABLE,
+            default_animation=default_animation
+        )
 
 
 class FakePatrollingCop(BaseCop):
