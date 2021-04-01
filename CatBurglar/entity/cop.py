@@ -1,9 +1,10 @@
-from CatBurglar.entity import WALK_RIGHT, WALK_LEFT, REQUIRED_FOR_ACTORS, Actor
+from CatBurglar.entity import WALK_RIGHT, WALK_LEFT, REQUIRED_FOR_ACTORS, Actor, DRONE_REQUIRED_STATES
 from CatBurglar.util import Timer
 from CatBurglar.util.asset_loading import ASSET_BASE_PATH, preload_entity_texture_table, \
     preload_entity_texture_alt_skin_table
 
 COP_PATH = ASSET_BASE_PATH / "cop"
+DRONE_ASSET_PATH = ASSET_BASE_PATH / "drone"
 
 COP_ALT_TABLE = preload_entity_texture_alt_skin_table(
     COP_PATH, REQUIRED_FOR_ACTORS
@@ -49,5 +50,20 @@ class FakePatrollingCop(BaseCop):
             else:
                 self.current_animation_name = WALK_RIGHT
             self.reverse_timer.remaining = self.delay_between_reversals
+
+
+DRONE_STATE_TABLE = preload_entity_texture_table(
+    DRONE_ASSET_PATH,
+    DRONE_REQUIRED_STATES
+)
+
+class Drone(Actor):
+
+    def __init__(self, default_animation="fly_hover"):
+        super().__init__(
+            animations=DRONE_STATE_TABLE,
+            default_animation=default_animation
+        )
+
 
 
