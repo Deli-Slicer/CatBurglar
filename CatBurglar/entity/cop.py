@@ -11,10 +11,10 @@ COP_ALT_TABLE = preload_entity_texture_alt_skin_table(
 )
 
 
-class BaseRunnerEnemy(Actor):
+class BaseEnemy(Actor):
     """
 
-    Runs to the left, destroys self when it goes off screen.
+    Baseclass for self-vanishing enemies that move left.
 
     """
 
@@ -51,35 +51,22 @@ class BaseRunnerEnemy(Actor):
             self.remove_from_sprite_lists()
 
 
-class PatrollingCop(BaseRunnerEnemy):
+class BasicRunnerCop(BaseEnemy):
     """
-    Not intended to be the basis of actual gameplay. Only encapsulate movement demo.
 
-    There needs to be another baseclass added between NamedAnimationsSprite for
-    mobile characters that has state change logic support for movement.
+    A basic ground-based enemy that goes left.
+
     """
 
     def __init__(
             self,
-            default_animation=WALK_RIGHT,
-            delay_between_reversals=3.0
     ):
         super().__init__(
-            default_animation=default_animation,
+            default_animation=WALK_LEFT
         )
-        self.delay_between_reversals = delay_between_reversals
-        self.reverse_timer = Timer(delay_between_reversals)
 
     def update(self, delta_time: float = 1 / 60):
         super().update()
-
-        self.reverse_timer.update(delta_time)
-        if self.reverse_timer.remaining <= delta_time:
-            if self.current_animation_name == WALK_RIGHT:
-                self.current_animation_name = WALK_LEFT
-            else:
-                self.current_animation_name = WALK_RIGHT
-            self.reverse_timer.remaining = self.delay_between_reversals
 
 
 DRONE_STATE_TABLE = preload_entity_texture_table(
@@ -87,7 +74,7 @@ DRONE_STATE_TABLE = preload_entity_texture_table(
     DRONE_REQUIRED_STATES
 )
 
-class Drone(BaseRunnerEnemy):
+class Drone(BaseEnemy):
 
     def __init__(self, default_animation="fly_left"):
         super().__init__(
