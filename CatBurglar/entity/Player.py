@@ -41,13 +41,15 @@ class Player(Actor):
         elif self.key_handler.is_pressed("DOWN"):
             self.change_y -= self.move_speed
 
+
         # if we're below movement threshold but haven't updated
         # then set our still direction
-        if self.moving and abs(self.change_x) <= 0.1:
-            if self.current_animation_name == WALK_LEFT:
-                self.current_animation_name = STILL_LEFT
-            else:
-                self.current_animation_name = STILL_RIGHT
+        if self.moving:
+            if abs(self.change_x) <= 0.1:
+                if self.current_animation_name == WALK_LEFT:
+                    self.current_animation_name = STILL_LEFT
+                else:
+                    self.current_animation_name = STILL_RIGHT
 
         super().update()
 

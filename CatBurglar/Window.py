@@ -1,11 +1,13 @@
+from typing import Type
 
 import arcade
 import pyglet.gl as gl
+from arcade import SpriteList
 
 from CatBurglar.input.KeyHandler import KeyHandler
 from CatBurglar.graphics.Camera import Camera
 from CatBurglar.entity.Player import Player
-from CatBurglar.entity.cop import FakePatrollingCop
+from CatBurglar.entity.cop import FakePatrollingCop, Drone
 from CatBurglar.util import Timer
 
 WIDTH = 800
@@ -18,6 +20,17 @@ TITLE = "Cat Burglar"
 
 RESIZABLE = True
 
+
+def spawn_entities_from_map_layer(
+        source_list: SpriteList,
+        entity_type: Type,
+        destination_list: SpriteList
+):
+
+        for reference in source_list:
+            new_entity = entity_type()
+            new_entity.set_position(reference.center_x, reference.center_y)
+            destination_list.append(new_entity)
 
 class Window(arcade.Window):
 
@@ -54,15 +67,23 @@ class Window(arcade.Window):
                                                       scaling=1,
                                                       use_spatial_hash=True)
 
+        drone_ref = arcade.tilemap.process_layer(map_object=tmx_map,
+                                                 layer_name="drones",
+                                                 scaling=1,
+                                                 use_spatial_hash=True
+                                                 )
+        """
         for cop_tile in cops_list:
             cop = FakePatrollingCop()
             cop.set_position(cop_tile.center_x, cop_tile.center_y)
             self.sprite_list.append(cop)
+        """
+        spawn_entities_from_map_layer(cops_list, FakePatrollingCop, self.sprite_list)
+        spawn_entities_from_map_layer(drone_ref, Drone, self.sprite_list)
 
         self.physics_engine = arcade.PhysicsEnginePlatformer(self.player,
                                                              self.wall_list,
                                                              1)
-
 
         self.sprite_list.append(self.player)
 

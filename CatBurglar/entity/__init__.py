@@ -31,6 +31,8 @@ error.
 
 """
 
+# ground-based actors
+
 # Default non-moving animation states for actors
 STILL_RIGHT = "still_right"
 STILL_LEFT = "still_left"
@@ -50,6 +52,15 @@ REQUIRED_FOR_ACTORS = [
 STILL_FACINGCAMERA = "still_facing"
 STILL_AWAYCAMERA = "still_awaycamera"
 
+# flying states
+FLY_LEFT = "fly_left"
+FLY_RIGHT = "fly_right"
+FLY_HOVER = "fly_hover"
+DRONE_REQUIRED_STATES = [
+    FLY_LEFT,
+    FLY_RIGHT,
+    FLY_HOVER
+]
 
 class NamedAnimationsSprite(Sprite):
     """
@@ -114,7 +125,7 @@ class NamedAnimationsSprite(Sprite):
             alt_table: List[AnimationStateDict] = None,
             default_animation: str = STILL_RIGHT,
             current_animation_name: str = None,
-            frame_length: float = 1 / 12
+            frame_length: float = 1 / 48
     ):
         """
 
@@ -236,7 +247,5 @@ class Actor(NamedAnimationsSprite):
 
         elif abs(self.change_x) <= 0.1 and self.moving:
             self._moving = False
-
-
 
 
