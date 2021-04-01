@@ -242,6 +242,8 @@ class Actor(NamedAnimationsSprite):
         )
 
     def update(self):
+        super(Actor, self).update()
+
         if abs(self.change_x) > 0.1 and not self.moving:
             self._moving = True
 

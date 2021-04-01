@@ -7,7 +7,7 @@ from arcade import SpriteList
 from CatBurglar.input.KeyHandler import KeyHandler
 from CatBurglar.graphics.Camera import Camera
 from CatBurglar.entity.Player import Player
-from CatBurglar.entity.cop import FakePatrollingCop, Drone
+from CatBurglar.entity.cop import BasicRunnerCop, Drone
 from CatBurglar.util import Timer
 
 WIDTH = 800
@@ -78,7 +78,7 @@ class Window(arcade.Window):
             cop.set_position(cop_tile.center_x, cop_tile.center_y)
             self.sprite_list.append(cop)
         """
-        spawn_entities_from_map_layer(cops_list, FakePatrollingCop, self.sprite_list)
+        spawn_entities_from_map_layer(cops_list, BasicRunnerCop, self.sprite_list)
         spawn_entities_from_map_layer(drone_ref, Drone, self.sprite_list)
 
         self.physics_engine = arcade.PhysicsEnginePlatformer(self.player,
@@ -87,7 +87,7 @@ class Window(arcade.Window):
 
         self.sprite_list.append(self.player)
 
-        self.cop = FakePatrollingCop()
+        self.cop = BasicRunnerCop()
         self.cop.set_position(64, 32)
         self.sprite_list.append(self.cop)
 
