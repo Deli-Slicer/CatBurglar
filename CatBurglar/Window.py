@@ -4,6 +4,7 @@ import arcade
 import pyglet.gl as gl
 from arcade import SpriteList
 
+from CatBurglar.entity.terrain import AnimatedFloorTile
 from CatBurglar.input.KeyHandler import KeyHandler
 from CatBurglar.graphics.Camera import Camera
 from CatBurglar.entity.Player import Player
@@ -12,6 +13,8 @@ from CatBurglar.util import Timer
 
 WIDTH = 800
 HEIGHT = 450
+
+TILE_SIZE_PX = 16
 
 MIN_WIDTH = 160
 MIN_HEIGHT = 90
@@ -41,6 +44,15 @@ class Window(arcade.Window):
 
         self.set_min_size(MIN_WIDTH, MIN_HEIGHT)
 
+        self.physics_engine: arcade.PhysicsEnginePlatformer = None
+        self.wall_list: SpriteList = None
+        self.key_handler: KeyHandler = None
+        self.zoom_speed: float = None
+        self.player: Player = None
+        self.camera: None = None
+        self.sprite_list: SpriteList = None
+        self.enemy_list: SpriteList = None
+
     def setup(self):
         self.sprite_list = arcade.SpriteList()
         self.key_handler = KeyHandler()
@@ -51,50 +63,40 @@ class Window(arcade.Window):
         self.player = Player(self.key_handler)
         self.player.set_position(32, 32)
 
-        import os
+        # the ground will animate to create the illusion of motion
+        # instead of moving the floor tiles. the player never moves.
+        self.wall_list = SpriteList(use_spatial_hash=True)
 
-        map_path = "./assets/map_files/tiles-as-objects.tmx"
-
-        tmx_map = arcade.tilemap.read_tmx(map_path)
-
-        self.wall_list = arcade.tilemap.process_layer(map_object=tmx_map,
-                                                      layer_name="tiles",
-                                                      scaling=1,
-                                                      use_spatial_hash=True)
-
-        cops_list = arcade.tilemap.process_layer(map_object=tmx_map,
-                                                      layer_name="cops",
-                                                      scaling=1,
-                                                      use_spatial_hash=True)
-
-        drone_ref = arcade.tilemap.process_layer(map_object=tmx_map,
-                                                 layer_name="drones",
-                                                 scaling=1,
-                                                 use_spatial_hash=True
-                                                 )
-        """
-        for cop_tile in cops_list:
-            cop = FakePatrollingCop()
-            cop.set_position(cop_tile.center_x, cop_tile.center_y)
-            self.sprite_list.append(cop)
-        """
-        spawn_entities_from_map_layer(cops_list, BasicRunnerCop, self.sprite_list)
-        spawn_entities_from_map_layer(drone_ref, Drone, self.sprite_list)
+        for x_position in range(-2 * TILE_SIZE_PX, 40 * TILE_SIZE_PX, TILE_SIZE_PX):
+            floor_tile = AnimatedFloorTile()
+            floor_tile.set_position(x_position, 16)
+            self.wall_list.append(floor_tile)
 
         self.physics_engine = arcade.PhysicsEnginePlatformer(self.player,
                                                              self.wall_list,
                                                              1)
-
         self.sprite_list.append(self.player)
 
-        self.cop = BasicRunnerCop()
-        self.cop.set_position(64, 32)
-        self.sprite_list.append(self.cop)
+        # these will always be moving
+        self.enemy_list = SpriteList(use_spatial_hash=False)
+
+        cop = BasicRunnerCop()
+        cop.set_position(TILE_SIZE_PX * 35, 32)
+        self.enemy_list.append(cop)
+        self.sprite_list.append(cop)
+
+        drone = Drone()
+        drone.set_position(TILE_SIZE_PX * 10, TILE_SIZE_PX * 4)
+        self.enemy_list.append(drone)
+
+        self.sprite_list.append(drone)
 
 
     def on_update(self, delta_time):
         self.sprite_list.update()
         self.physics_engine.update()
+
+        self.wall_list.update_animation()
 
         self.sprite_list.update_animation(delta_time=delta_time)
 
