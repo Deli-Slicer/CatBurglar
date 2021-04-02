@@ -69,7 +69,7 @@ class Window(arcade.Window):
 
         for x_position in range(-2 * TILE_SIZE_PX, 40 * TILE_SIZE_PX, TILE_SIZE_PX):
             floor_tile = AnimatedFloorTile()
-            floor_tile.set_position(x_position, 16)
+            floor_tile.set_position(x_position, 0)
             self.wall_list.append(floor_tile)
 
         self.physics_engine = arcade.PhysicsEnginePlatformer(self.player,
@@ -81,12 +81,12 @@ class Window(arcade.Window):
         self.enemy_list = SpriteList(use_spatial_hash=False)
 
         cop = BasicRunnerCop()
-        cop.set_position(TILE_SIZE_PX * 35, 32)
+        cop.set_position(TILE_SIZE_PX * 35, 24)
         self.enemy_list.append(cop)
         self.sprite_list.append(cop)
 
         drone = Drone()
-        drone.set_position(TILE_SIZE_PX * 10, TILE_SIZE_PX * 4)
+        drone.set_position(TILE_SIZE_PX * 30, TILE_SIZE_PX * 4)
         self.enemy_list.append(drone)
 
         self.sprite_list.append(drone)
