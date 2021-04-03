@@ -4,23 +4,27 @@ import arcade
 import pyglet.gl as gl
 from arcade import SpriteList
 from arcade.gui import UIManager, UILabel
+from arcade.gui.ui_style import UIStyle
 
 from CatBurglar.entity.physics import RunnerPhysicsEngine
 from CatBurglar.entity.spawner import EnemySpawner
 from CatBurglar.entity.terrain import AnimatedFloorTile, TILE_SIZE_PX, WIDTH_IN_TILES, HEIGHT_IN_TILES
 from CatBurglar.input.KeyHandler import KeyHandler
 from CatBurglar.graphics.Camera import Camera
-from CatBurglar.entity.Player import Player
+from CatBurglar.entity.Player import Player, MoveState
 from CatBurglar.entity.cop import BasicRunnerCop, Drone
 from CatBurglar.util import StopwatchTimer
 
+
+# size of display before viewport scaling
+BASE_WIDTH_PX = WIDTH_IN_TILES * TILE_SIZE_PX
+BASE_HEIGHT_PX = HEIGHT_IN_TILES * TILE_SIZE_PX
+
+# upscaling for viewport size
 ZOOM_FACTOR = 4
+SCALED_WIDTH_PX = BASE_WIDTH_PX * ZOOM_FACTOR
+SCALED_HEIGHT_PX = BASE_HEIGHT_PX * ZOOM_FACTOR
 
-WIDTH_PX = WIDTH_IN_TILES * TILE_SIZE_PX * ZOOM_FACTOR
-HEIGHT_PX = HEIGHT_IN_TILES * TILE_SIZE_PX * ZOOM_FACTOR
-
-MIN_WIDTH = 160
-MIN_HEIGHT = 90
 
 TITLE = "Cat Burglar"
 
@@ -62,13 +66,17 @@ class GameView(arcade.View):
 
         self.message_display_box = UILabel(
             "Test text",
-            center_x= (WIDTH_PX / ZOOM_FACTOR) / 2,
-            center_y= (HEIGHT_PX / ZOOM_FACTOR) / 2
+            center_x=BASE_WIDTH_PX / 2,
+            center_y=3 * (BASE_HEIGHT_PX / 4)
+        )
+
+        self.message_display_box.set_style_attrs(
+            font_name=["Courier", "Courier New", "Nimbus Mono"],
+            font_size=8
         )
         self.ui_manager.add_ui_element(
             self.message_display_box
         )
-
 
         ground_level_y = TILE_SIZE_PX
         self.sprite_list = arcade.SpriteList()
@@ -130,7 +138,7 @@ class GameView(arcade.View):
         arcade.start_render()
 
         # upscale by 4x
-        arcade.set_viewport(0, WIDTH_PX / 4, 0, HEIGHT_PX / 4)
+        arcade.set_viewport(0, SCALED_WIDTH_PX / 4, 0, SCALED_HEIGHT_PX / 4)
 
         # self.camera.set_viewport()
         self.sprite_list.draw(filter=gl.GL_NEAREST)
