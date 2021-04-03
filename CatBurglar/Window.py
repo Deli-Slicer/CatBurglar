@@ -11,8 +11,14 @@ from CatBurglar.graphics.Camera import Camera
 from CatBurglar.entity.Player import Player
 from CatBurglar.entity.cop import BasicRunnerCop, Drone
 
-WIDTH = 800
-HEIGHT = 450
+
+WIDTH_IN_TILES = 12
+HEIGHT_IN_TILES = 8
+
+ZOOM_FACTOR = 4
+
+WIDTH_PX = WIDTH_IN_TILES * TILE_SIZE_PX * ZOOM_FACTOR
+HEIGHT_PX = HEIGHT_IN_TILES * TILE_SIZE_PX * ZOOM_FACTOR
 
 MIN_WIDTH = 160
 MIN_HEIGHT = 90
@@ -36,7 +42,7 @@ def spawn_entities_from_map_layer(
 class Window(arcade.Window):
 
     def __init__(self):
-        super().__init__(WIDTH, HEIGHT, TITLE, resizable=RESIZABLE)
+        super().__init__(WIDTH_PX, HEIGHT_PX, TITLE, resizable=RESIZABLE)
 
         self.center_window()
 
@@ -61,7 +67,8 @@ class Window(arcade.Window):
         self.zoom_speed = .95
 
         self.player = Player(self.key_handler)
-        self.player.set_position(32, ground_level_y)
+
+        self.player.set_position(2 * TILE_SIZE_PX, ground_level_y)
 
         # the ground will animate to create the illusion of motion
         # instead of moving the floor tiles. the player never moves.
@@ -70,9 +77,9 @@ class Window(arcade.Window):
         # these will always be moving
         self.enemy_list = SpriteList(use_spatial_hash=False)
 
-        for x_position in range(-2 * TILE_SIZE_PX, 40 * TILE_SIZE_PX, TILE_SIZE_PX):
+        for x_position in range(0, WIDTH_IN_TILES * TILE_SIZE_PX, TILE_SIZE_PX):
             floor_tile = AnimatedFloorTile()
-            floor_tile.set_position(x_position, TILE_SIZE_PX / 2)
+            floor_tile.set_position(TILE_SIZE_PX / 2 + x_position, TILE_SIZE_PX / 2)
             self.wall_list.append(floor_tile)
 
         self.physics_engine = RunnerPhysicsEngine(
@@ -84,12 +91,12 @@ class Window(arcade.Window):
 
 
         cop = BasicRunnerCop()
-        cop.set_position(TILE_SIZE_PX * 35, ground_level_y + 16)
+        cop.set_position(TILE_SIZE_PX * 35, ground_level_y + TILE_SIZE_PX)
         self.enemy_list.append(cop)
         self.sprite_list.append(cop)
 
         drone = Drone()
-        drone.set_position(TILE_SIZE_PX * 30, TILE_SIZE_PX * 4)
+        drone.set_position(TILE_SIZE_PX * 30, TILE_SIZE_PX * ZOOM_FACTOR)
         self.enemy_list.append(drone)
 
         self.sprite_list.append(drone)
@@ -119,7 +126,7 @@ class Window(arcade.Window):
         # needs to be called every frame, huh.
 
         # upscale by 4x
-        arcade.set_viewport(0, WIDTH / 4, 0, HEIGHT / 4)
+        arcade.set_viewport(0, WIDTH_PX / 4, 0, HEIGHT_PX / 4)
 
         # self.camera.set_viewport()
         self.sprite_list.draw(filter=gl.GL_NEAREST)
