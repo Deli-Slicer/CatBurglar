@@ -95,6 +95,7 @@ class Window(arcade.Window):
         self.sprite_list.append(drone)
 
 
+
     def on_update(self, delta_time):
         self.sprite_list.update()
         self.physics_engine.update()
@@ -103,18 +104,22 @@ class Window(arcade.Window):
 
         self.sprite_list.update_animation(delta_time=delta_time)
 
-        if self.key_handler.is_pressed("ZOOM_IN"):
-            self.camera.zoom(self.zoom_speed)
-        elif self.key_handler.is_pressed("ZOOM_OUT"):
-            self.camera.zoom(1 / self.zoom_speed)
+        #if self.key_handler.is_pressed("ZOOM_IN"):
+        #    self.camera.zoom(self.zoom_speed)
+        #elif self.key_handler.is_pressed("ZOOM_OUT"):
+        #    self.camera.zoom(1 / self.zoom_speed)
 
-        self.camera.scroll_to(self.player.center_x, self.player.center_y)
+        #self.camera.scroll_to(self.player.center_x, self.player.center_y)
 
     def on_draw(self):
         arcade.start_render()
 
-        self.camera.set_viewport()
+        # needs to be called every frame, huh.
 
+        # upscale by 4x
+        arcade.set_viewport(0, WIDTH / 4, 0, HEIGHT / 4)
+
+        # self.camera.set_viewport()
         self.sprite_list.draw(filter=gl.GL_NEAREST)
 
         self.wall_list.draw(filter=gl.GL_NEAREST)
