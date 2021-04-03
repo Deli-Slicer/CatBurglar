@@ -1,5 +1,5 @@
 from CatBurglar.entity import WALK_RIGHT, WALK_LEFT, REQUIRED_FOR_ACTORS, Actor, DRONE_REQUIRED_STATES
-from CatBurglar.util import Timer
+from CatBurglar.util import CountdownTimer
 from CatBurglar.util.asset_loading import ASSET_BASE_PATH, preload_entity_texture_table, \
     preload_entity_texture_alt_skin_table
 
@@ -76,7 +76,10 @@ DRONE_STATE_TABLE = preload_entity_texture_table(
 
 class Drone(BaseEnemy):
 
-    def __init__(self, default_animation="fly_left"):
+    def __init__(
+            self,
+            default_animation="fly_left"
+    ):
         super().__init__(
             animations=DRONE_STATE_TABLE,
             default_animation=default_animation

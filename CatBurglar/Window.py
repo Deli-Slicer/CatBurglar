@@ -10,7 +10,7 @@ from CatBurglar.input.KeyHandler import KeyHandler
 from CatBurglar.graphics.Camera import Camera
 from CatBurglar.entity.Player import Player
 from CatBurglar.entity.cop import BasicRunnerCop, Drone
-from CatBurglar.util import Timer
+from CatBurglar.util import CountdownTimer
 
 WIDTH = 800
 HEIGHT = 450
