@@ -16,6 +16,8 @@ class KeyHandler:
         self.key_codes_list = {}
         self.keys = {}
 
+        self.add_key("JUMP", SPACE)
+
         self.add_key("UP", UP, W)
         self.add_key("DOWN", DOWN, S)
         self.add_key("LEFT", LEFT, A)
