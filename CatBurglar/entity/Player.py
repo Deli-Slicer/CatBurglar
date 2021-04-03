@@ -27,7 +27,7 @@ class Player(Actor):
     def __init__(self, key_handler: KeyHandler, physics_engine: PhysicsEnginePlatformer = None):
         super().__init__(
            animations=GORILLA_TEXTURES,
-            default_animation=WALK_RIGHT
+            default_animation="catwalk_right"
         )
 
         self.key_handler = key_handler
@@ -47,9 +47,9 @@ class Player(Actor):
     @move_state.setter
     def move_state(self, new_state):
         if new_state == MoveState.RUNNING:
-            self.current_animation_name = WALK_RIGHT
+            self.current_animation_name = "catwalk_right"
         else:
-            self.current_animation_name = STILL_RIGHT
+            self.current_animation_name = "catstill_right"
 
         self._move_state = new_state
 
