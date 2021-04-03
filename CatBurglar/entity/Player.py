@@ -1,3 +1,5 @@
+from enum import Enum, auto, unique
+
 from arcade import PhysicsEngineSimple, PhysicsEnginePlatformer
 
 from CatBurglar.entity import REQUIRED_FOR_ACTORS, Actor, WALK_LEFT, WALK_RIGHT, STILL_RIGHT, STILL_LEFT
@@ -13,6 +15,12 @@ GORILLA_TEXTURES = preload_entity_texture_table(
 
 GRAVITY = 1
 
+
+@unique
+class MoveState(Enum):
+   RUNNING = auto()
+   JUMPING = auto()
+   FALLING = auto()
 
 class Player(Actor):
 
@@ -30,6 +38,21 @@ class Player(Actor):
 
         self.move_speed = 1
         self.jump_speed = 10
+        self.falling_started: bool = False
+        self.move_state = MoveState.RUNNING
+
+    @property
+    def jumping(self):
+        return self.move_state == MoveState.JUMPING
+
+    @property
+    def running(self):
+        return self.move_state == MoveState.RUNNING
+
+    @property
+    def falling(self):
+        return self.move_state == MoveState.FALLING
+
 
     def update(self):
 
@@ -45,11 +68,6 @@ class Player(Actor):
             self.current_animation_name = WALK_RIGHT
 
         """
-
-        if self.key_handler.is_pressed("JUMP"):
-
-            if self.physics_engine.can_jump():
-                self.physics_engine.jump(10)
 
         """
         elif self.key_handler.is_pressed("DOWN"):

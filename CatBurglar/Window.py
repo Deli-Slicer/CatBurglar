@@ -4,6 +4,7 @@ import arcade
 import pyglet.gl as gl
 from arcade import SpriteList
 
+from CatBurglar.entity.physics import RunnerPhysicsEngine
 from CatBurglar.entity.terrain import AnimatedFloorTile
 from CatBurglar.input.KeyHandler import KeyHandler
 from CatBurglar.graphics.Camera import Camera
@@ -45,7 +46,7 @@ class Window(arcade.Window):
         if RESIZABLE:
             self.set_min_size(MIN_WIDTH, MIN_HEIGHT)
 
-        self.physics_engine: arcade.PhysicsEnginePlatformer = None
+        self.physics_engine: RunnerPhysicsEngine = None
         self.wall_list: SpriteList = None
         self.key_handler: KeyHandler = None
         self.zoom_speed: float = None
@@ -55,6 +56,7 @@ class Window(arcade.Window):
         self.enemy_list: SpriteList = None
 
     def setup(self):
+        ground_level_y = TILE_SIZE_PX
         self.sprite_list = arcade.SpriteList()
         self.key_handler = KeyHandler()
 
@@ -62,30 +64,30 @@ class Window(arcade.Window):
         self.zoom_speed = .95
 
         self.player = Player(self.key_handler)
-        self.player.set_position(32, 0)
+        self.player.set_position(32, ground_level_y)
 
         # the ground will animate to create the illusion of motion
         # instead of moving the floor tiles. the player never moves.
         self.wall_list = SpriteList(use_spatial_hash=True)
 
-        for x_position in range(-2 * TILE_SIZE_PX, 40 * TILE_SIZE_PX, TILE_SIZE_PX):
-            floor_tile = AnimatedFloorTile()
-            floor_tile.set_position(x_position, 0)
-            self.wall_list.append(floor_tile)
-
-        # this works but but has terrible game feel, no control over jump
-        self.physics_engine = arcade.PhysicsEnginePlatformer(self.player,
-                                                             self.wall_list,
-                                                             1)
-        self.player.physics_engine = self.physics_engine
-
-        self.sprite_list.append(self.player)
-
         # these will always be moving
         self.enemy_list = SpriteList(use_spatial_hash=False)
 
+        for x_position in range(-2 * TILE_SIZE_PX, 40 * TILE_SIZE_PX, TILE_SIZE_PX):
+            floor_tile = AnimatedFloorTile()
+            floor_tile.set_position(x_position, TILE_SIZE_PX / 2)
+            self.wall_list.append(floor_tile)
+
+        self.physics_engine = RunnerPhysicsEngine(
+            self.player,
+            self.key_handler,
+            self.enemy_list
+        )
+        self.sprite_list.append(self.player)
+
+
         cop = BasicRunnerCop()
-        cop.set_position(TILE_SIZE_PX * 35, 24)
+        cop.set_position(TILE_SIZE_PX * 35, ground_level_y + 16)
         self.enemy_list.append(cop)
         self.sprite_list.append(cop)
 
@@ -96,15 +98,17 @@ class Window(arcade.Window):
         self.sprite_list.append(drone)
 
 
-
     def on_update(self, delta_time):
+
+        #self.player.update()
         self.sprite_list.update()
-        self.physics_engine.update()
+        collisions = self.physics_engine.update()
+        if collisions:
+            print(f"Collided with the following entities: {collisions!r}")
 
         self.wall_list.update_animation()
 
         self.sprite_list.update_animation(delta_time=delta_time)
-
         #if self.key_handler.is_pressed("ZOOM_IN"):
         #    self.camera.zoom(self.zoom_speed)
         #elif self.key_handler.is_pressed("ZOOM_OUT"):
