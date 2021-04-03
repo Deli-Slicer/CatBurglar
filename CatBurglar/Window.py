@@ -3,6 +3,7 @@ from typing import Type
 import arcade
 import pyglet.gl as gl
 from arcade import SpriteList
+from arcade.gui import UIManager, UILabel
 
 from CatBurglar.entity.physics import RunnerPhysicsEngine
 from CatBurglar.entity.spawner import EnemySpawner
@@ -37,15 +38,10 @@ def spawn_entities_from_map_layer(
             new_entity.set_position(reference.center_x, reference.center_y)
             destination_list.append(new_entity)
 
-class Window(arcade.Window):
+class GameView(arcade.View):
 
     def __init__(self):
-        super().__init__(WIDTH_PX, HEIGHT_PX, TITLE, resizable=RESIZABLE)
-
-        self.center_window()
-
-        if RESIZABLE:
-            self.set_min_size(MIN_WIDTH, MIN_HEIGHT)
+        super().__init__()
 
         self.physics_engine: RunnerPhysicsEngine = None
         self.wall_list: SpriteList = None
@@ -58,14 +54,28 @@ class Window(arcade.Window):
 
         self.global_time_elapsed: StopwatchTimer = None
         self.enemy_spawner: EnemySpawner = None
+        self.message_display_box = None
+        self.ui_manager = UIManager()
 
     def setup(self):
+        self.ui_manager.purge_ui_elements()
+
+        self.message_display_box = UILabel(
+            "Test text",
+            center_x= (WIDTH_PX / ZOOM_FACTOR) / 2,
+            center_y= (HEIGHT_PX / ZOOM_FACTOR) / 2
+        )
+        self.ui_manager.add_ui_element(
+            self.message_display_box
+        )
+
+
         ground_level_y = TILE_SIZE_PX
         self.sprite_list = arcade.SpriteList()
         self.key_handler = KeyHandler()
 
-        self.camera = Camera(self.width, self.height, True)
-        self.zoom_speed = .95
+#        self.camera = Camera(self.width, self.height, True)
+#        self.zoom_speed = .95
 
         self.player = Player(self.key_handler)
         self.player.set_position(2 * TILE_SIZE_PX, ground_level_y)
