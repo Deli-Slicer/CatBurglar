@@ -38,8 +38,20 @@ class Player(Actor):
 
         self.move_speed = 1
         self.jump_speed = 10
-        self.falling_started: bool = False
-        self.move_state = MoveState.RUNNING
+        self._move_state = MoveState.RUNNING
+
+    @property
+    def move_state(self) -> MoveState:
+        return self._move_state
+
+    @move_state.setter
+    def move_state(self, new_state):
+        if new_state == MoveState.RUNNING:
+            self.current_animation_name = WALK_RIGHT
+        else:
+            self.current_animation_name = STILL_RIGHT
+
+        self._move_state = new_state
 
     @property
     def jumping(self):
