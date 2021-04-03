@@ -81,18 +81,22 @@ class StopwatchTimer:
         self.time = time
         self.running = running
         self.maximum = maximum
+        self._completion = 0.0 if maximum else None
 
     def update(self, delta_time: float = 1 / 60) -> None:
 
         if delta_time and self.running:
             self.time += delta_time
+        else:
+            return
 
-        if self.maximum <= self.maximum:
-            self.running = False
+        if self.maximum:
+            if self.maximum <= self.time:
+                self.running = False
+            self._completion = min(1.0, self.time / self.maximum)
 
     @property
     def completion(self) -> float:
-        if self.maximum:
-            return self.time / self.maximum
+        return self._completion
 
 
