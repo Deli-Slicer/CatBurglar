@@ -65,6 +65,7 @@ class CountdownTimer:
             if self._remaining == 0.0:
                 self.running = False
 
+
 class StopwatchTimer:
     """
 
@@ -75,12 +76,23 @@ class StopwatchTimer:
         self,
         time: float = 0.0,
         running: bool = False,
+        maximum: float = None
     ):
         self.time = time
         self.running = running
+        self.maximum = maximum
 
     def update(self, delta_time: float = 1 / 60) -> None:
+
         if delta_time and self.running:
             self.time += delta_time
+
+        if self.maximum <= self.maximum:
+            self.running = False
+
+    @property
+    def completion(self) -> float:
+        if self.maximum:
+            return self.time / self.maximum
 
 

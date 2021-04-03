@@ -77,7 +77,10 @@ class Window(arcade.Window):
 
         # Enemies will be moving instead of the player and the ground
         self.enemy_list = SpriteList(use_spatial_hash=False)
-        self.global_time_elapsed = StopwatchTimer(running=True)
+
+        # game is 2 minutes long
+        self.global_time_elapsed = StopwatchTimer(running=True, maximum=2 * 60.0)
+
         self.enemy_spawner = EnemySpawner(self.enemy_list, self.global_time_elapsed)
 
         # create the ground

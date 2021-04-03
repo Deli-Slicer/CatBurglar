@@ -14,7 +14,6 @@ class EnemySpawner:
             min_enemy_gap_sec=1.0,
             max_enemy_gap_sec=2.0,
             # 5 minutes till escape density reached
-            time_till_max_enemy_density = 2 * 60.0
     ):
         self.enemy_list = enemy_list
 
@@ -29,7 +28,6 @@ class EnemySpawner:
 
         self.min_enemy_gap_sec = min_enemy_gap_sec
         self.max_enemy_gap_sec = max_enemy_gap_sec
-        self.time_till_max_enemy_density = time_till_max_enemy_density
 
         # give some breathing room before the enemies start coming
         self.time_till_next = CountdownTimer(remaining=5.0)
@@ -61,6 +59,7 @@ class EnemySpawner:
                 lerp(
                     self.max_enemy_gap_sec,
                     self.min_enemy_gap_sec,
-                    self.global_time_elapsed.time / self.time_till_max_enemy_density
+                    self.global_time_elapsed.completion
                 )
             )
+
