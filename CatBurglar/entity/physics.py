@@ -1,3 +1,15 @@
+"""
+
+Simple runner physics modelled after the implementations included in
+physics_engines.py inside of arcade.
+
+"""
+from typing import List
+from arcade import (
+    Sprite,
+    SpriteList,
+    check_for_collision_with_list
+)
 from CatBurglar.entity.Player import MoveState, Player
 from CatBurglar.input.KeyHandler import KeyHandler
 
@@ -16,9 +28,10 @@ class RunnerPhysicsEngine:
         self,
         player_sprite: Player,
         key_handler: KeyHandler,
+        enemy_list: SpriteList,
         ground_level: int = 16,
         gravity_constant: float = 0.3,
-        initial_jump_velocity: float = 5
+        initial_jump_velocity: float = 5,
     ):
         """
 
@@ -33,13 +46,14 @@ class RunnerPhysicsEngine:
         :param initial_jump_velocity: initial jump velocity in px / frame
         """
         self.player: Player = player_sprite
+        self.enemy_list: SpriteList = enemy_list
         self.ground_level: int = ground_level
         self.gravity_constant: float = gravity_constant
 
         self.initial_jump_velocity = initial_jump_velocity
         self.key_handler: KeyHandler = key_handler
 
-    def update(self, delta_time: float = 1 / 60):
+    def update(self, delta_time: float = 1 / 60) -> List[Sprite]:
         """
 
         Update the state based on key and current player state
@@ -79,4 +93,6 @@ class RunnerPhysicsEngine:
             self.player.move_state = MoveState.RUNNING
 
         self.player.update()
+        return check_for_collision_with_list(self.player, self.enemy_list)
+
 

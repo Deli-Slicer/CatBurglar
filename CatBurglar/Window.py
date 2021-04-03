@@ -70,6 +70,9 @@ class Window(arcade.Window):
         # instead of moving the floor tiles. the player never moves.
         self.wall_list = SpriteList(use_spatial_hash=True)
 
+        # these will always be moving
+        self.enemy_list = SpriteList(use_spatial_hash=False)
+
         for x_position in range(-2 * TILE_SIZE_PX, 40 * TILE_SIZE_PX, TILE_SIZE_PX):
             floor_tile = AnimatedFloorTile()
             floor_tile.set_position(x_position, TILE_SIZE_PX / 2)
@@ -77,12 +80,11 @@ class Window(arcade.Window):
 
         self.physics_engine = RunnerPhysicsEngine(
             self.player,
-            self.key_handler
+            self.key_handler,
+            self.enemy_list
         )
         self.sprite_list.append(self.player)
 
-        # these will always be moving
-        self.enemy_list = SpriteList(use_spatial_hash=False)
 
         cop = BasicRunnerCop()
         cop.set_position(TILE_SIZE_PX * 35, ground_level_y + 16)
@@ -100,7 +102,9 @@ class Window(arcade.Window):
 
         #self.player.update()
         self.sprite_list.update()
-        self.physics_engine.update()
+        collisions = self.physics_engine.update()
+        if collisions:
+            print(f"Collided with the following entities: {collisions!r}")
 
         self.wall_list.update_animation()
 
