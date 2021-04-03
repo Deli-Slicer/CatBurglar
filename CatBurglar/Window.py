@@ -21,7 +21,7 @@ MIN_HEIGHT = 90
 
 TITLE = "Cat Burglar"
 
-RESIZABLE = True
+RESIZABLE = False
 
 
 def spawn_entities_from_map_layer(
@@ -42,7 +42,8 @@ class Window(arcade.Window):
 
         self.center_window()
 
-        self.set_min_size(MIN_WIDTH, MIN_HEIGHT)
+        if RESIZABLE:
+            self.set_min_size(MIN_WIDTH, MIN_HEIGHT)
 
         self.physics_engine: arcade.PhysicsEnginePlatformer = None
         self.wall_list: SpriteList = None
@@ -131,4 +132,5 @@ class Window(arcade.Window):
         self.key_handler.on_key_release(key, modifiers)
 
     def on_resize(self, width, height):
-        self.camera.resize(width, height)
+        pass
+        #self.camera.resize(width, height)
