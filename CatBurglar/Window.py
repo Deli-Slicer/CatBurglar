@@ -41,14 +41,6 @@ def spawn_entities_from_map_layer(
             new_entity = entity_type()
             new_entity.set_position(reference.center_x, reference.center_y)
             destination_list.append(new_entity)
-"""
-MESSAGE_TABLE = [
-    (0.25, "You're 1/4th of the way through..."),
-    (0.50, "Half way there..."),
-    (0.75, f"Just another ")
-]
-"""
-
 
 class GameState(Enum):
     INTRO = auto()
