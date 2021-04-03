@@ -53,7 +53,8 @@ MESSAGE_TABLE = [
 class GameState(Enum):
     INTRO = auto()
     PLAYING = auto()
-    OVER = auto()
+    LOST = auto()
+    WON = auto()
 
 
 class GameView(arcade.View):
@@ -175,14 +176,18 @@ class GameView(arcade.View):
 
             collisions = self.physics_engine.update()
             if collisions:
-                self.game_state = GameState.OVER
+                self.game_state = GameState.LOST
                 self.show_message("You have failed to escape!\nPress SPACE again to exit.")
 
             self.enemy_list.update_animation(delta_time=delta_time)
             self.sprite_list.update_animation(delta_time=delta_time)
             self.wall_list.update_animation(delta_time=delta_time)
 
-        elif self.game_state == GameState.OVER:
+            if self.global_time_elapsed.completion == 1.0:
+                self.game_state = GameState.WON
+                self.show_message("You have rescued your cat!\nPress SPACE again to exit.")
+
+        elif self.game_state == GameState.LOST:
             if self.key_handler.is_pressed("JUMP"):
                 if not self.game_over_debounce:
                     pass
@@ -190,6 +195,17 @@ class GameView(arcade.View):
                     self.window.close()
             else:
                 self.game_over_debounce = True
+
+        # end-of-competition rush, bad copy and paste code.
+        elif self.game_state == GameState.LOST:
+            if self.key_handler.is_pressed("JUMP"):
+                if not self.game_over_debounce:
+                    pass
+                else:
+                    self.window.close()
+            else:
+                self.game_over_debounce = True
+
 
     def on_draw(self):
         arcade.start_render()
