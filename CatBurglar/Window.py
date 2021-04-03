@@ -61,7 +61,7 @@ class Window(arcade.Window):
         self.zoom_speed = .95
 
         self.player = Player(self.key_handler)
-        self.player.set_position(32, 32)
+        self.player.set_position(32, 0)
 
         # the ground will animate to create the illusion of motion
         # instead of moving the floor tiles. the player never moves.
@@ -72,9 +72,12 @@ class Window(arcade.Window):
             floor_tile.set_position(x_position, 0)
             self.wall_list.append(floor_tile)
 
+        # this works but but has terrible game feel, no control over jump
         self.physics_engine = arcade.PhysicsEnginePlatformer(self.player,
                                                              self.wall_list,
                                                              1)
+        self.player.physics_engine = self.physics_engine
+
         self.sprite_list.append(self.player)
 
         # these will always be moving
