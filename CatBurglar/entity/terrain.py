@@ -4,9 +4,11 @@ from CatBurglar.util.asset_loading import (
     preload_entity_texture_table
 )
 
+WIDTH_IN_TILES = 12
+HEIGHT_IN_TILES = 8
 TILE_SIZE_PX = 16
-TILE_PATH = ASSET_BASE_PATH / "tiles"
 
+TILE_PATH = ASSET_BASE_PATH / "tiles"
 GROUND_BASE_PATH = TILE_PATH / "ground"
 
 GROUND_ANIMATION_TABLE = preload_entity_texture_table(

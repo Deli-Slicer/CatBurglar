@@ -5,15 +5,13 @@ import pyglet.gl as gl
 from arcade import SpriteList
 
 from CatBurglar.entity.physics import RunnerPhysicsEngine
-from CatBurglar.entity.terrain import AnimatedFloorTile, TILE_SIZE_PX
+from CatBurglar.entity.spawner import EnemySpawner
+from CatBurglar.entity.terrain import AnimatedFloorTile, TILE_SIZE_PX, WIDTH_IN_TILES, HEIGHT_IN_TILES
 from CatBurglar.input.KeyHandler import KeyHandler
 from CatBurglar.graphics.Camera import Camera
 from CatBurglar.entity.Player import Player
 from CatBurglar.entity.cop import BasicRunnerCop, Drone
-
-
-WIDTH_IN_TILES = 12
-HEIGHT_IN_TILES = 8
+from CatBurglar.util import StopwatchTimer
 
 ZOOM_FACTOR = 4
 
@@ -58,6 +56,9 @@ class Window(arcade.Window):
         self.sprite_list: SpriteList = None
         self.enemy_list: SpriteList = None
 
+        self.global_time_elapsed: StopwatchTimer = None
+        self.enemy_spawner: EnemySpawner = None
+
     def setup(self):
         ground_level_y = TILE_SIZE_PX
         self.sprite_list = arcade.SpriteList()
@@ -67,16 +68,19 @@ class Window(arcade.Window):
         self.zoom_speed = .95
 
         self.player = Player(self.key_handler)
-
         self.player.set_position(2 * TILE_SIZE_PX, ground_level_y)
+        self.sprite_list.append(self.player)
 
         # the ground will animate to create the illusion of motion
         # instead of moving the floor tiles. the player never moves.
         self.wall_list = SpriteList(use_spatial_hash=True)
 
-        # these will always be moving
+        # Enemies will be moving instead of the player and the ground
         self.enemy_list = SpriteList(use_spatial_hash=False)
+        self.global_time_elapsed = StopwatchTimer(running=True)
+        self.enemy_spawner = EnemySpawner(self.enemy_list, self.global_time_elapsed)
 
+        # create the ground
         for x_position in range(0, WIDTH_IN_TILES * TILE_SIZE_PX, TILE_SIZE_PX):
             floor_tile = AnimatedFloorTile()
             floor_tile.set_position(TILE_SIZE_PX / 2 + x_position, TILE_SIZE_PX / 2)
@@ -87,25 +91,13 @@ class Window(arcade.Window):
             self.key_handler,
             self.enemy_list
         )
-        self.sprite_list.append(self.player)
-
-
-        cop = BasicRunnerCop()
-        cop.set_position(TILE_SIZE_PX * 35, ground_level_y + TILE_SIZE_PX)
-        self.enemy_list.append(cop)
-        self.sprite_list.append(cop)
-
-        drone = Drone()
-        drone.set_position(TILE_SIZE_PX * 30, TILE_SIZE_PX * ZOOM_FACTOR)
-        self.enemy_list.append(drone)
-
-        self.sprite_list.append(drone)
-
 
     def on_update(self, delta_time):
 
-        #self.player.update()
+        self.enemy_spawner.update(delta_time=delta_time)
         self.sprite_list.update()
+        self.enemy_list.update()
+
         collisions = self.physics_engine.update()
         if collisions:
             print(f"Collided with the following entities: {collisions!r}")
@@ -113,6 +105,7 @@ class Window(arcade.Window):
         self.wall_list.update_animation()
 
         self.sprite_list.update_animation(delta_time=delta_time)
+        self.enemy_list.update_animation(delta_time=delta_time)
         #if self.key_handler.is_pressed("ZOOM_IN"):
         #    self.camera.zoom(self.zoom_speed)
         #elif self.key_handler.is_pressed("ZOOM_OUT"):
@@ -123,14 +116,12 @@ class Window(arcade.Window):
     def on_draw(self):
         arcade.start_render()
 
-        # needs to be called every frame, huh.
-
         # upscale by 4x
         arcade.set_viewport(0, WIDTH_PX / 4, 0, HEIGHT_PX / 4)
 
         # self.camera.set_viewport()
         self.sprite_list.draw(filter=gl.GL_NEAREST)
-
+        self.enemy_list.draw(filter=gl.GL_NEAREST)
         self.wall_list.draw(filter=gl.GL_NEAREST)
 
     def on_key_press(self, key, modifiers):
