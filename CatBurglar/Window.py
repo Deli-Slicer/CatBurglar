@@ -93,7 +93,7 @@ class Window(arcade.Window):
         )
 
     def on_update(self, delta_time):
-
+        self.global_time_elapsed.update(delta_time=delta_time)
         self.enemy_spawner.update(delta_time=delta_time)
         self.sprite_list.update()
         self.enemy_list.update()

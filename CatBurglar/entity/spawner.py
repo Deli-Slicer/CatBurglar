@@ -11,9 +11,10 @@ class EnemySpawner:
             self,
             enemy_list: SpriteList,
             global_time_elapsed: StopwatchTimer,
-            min_enemy_gap_sec=1.5,
+            min_enemy_gap_sec=1.0,
             max_enemy_gap_sec=2.0,
-            time_till_max_enemy_density=18000.0
+            # 5 minutes till escape density reached
+            time_till_max_enemy_density = 2 * 60.0
     ):
         self.enemy_list = enemy_list
 
@@ -25,6 +26,10 @@ class EnemySpawner:
         # State timers used to determine time till next enemy
         self.global_time_elapsed = global_time_elapsed
         self.time_since_last_enemy = StopwatchTimer()
+
+        self.min_enemy_gap_sec = min_enemy_gap_sec
+        self.max_enemy_gap_sec = max_enemy_gap_sec
+        self.time_till_max_enemy_density = time_till_max_enemy_density
 
         # give some breathing room before the enemies start coming
         self.time_till_next = CountdownTimer(remaining=5.0)
@@ -51,4 +56,11 @@ class EnemySpawner:
             new_enemy.set_position(x_position, y_position)
 
             enemy_list.append(new_enemy)
-            self.time_till_next.remaining = 2.0
+            self.time_till_next.remaining = random.uniform(
+                self.min_enemy_gap_sec,
+                lerp(
+                    self.max_enemy_gap_sec,
+                    self.min_enemy_gap_sec,
+                    self.global_time_elapsed.time / self.time_till_max_enemy_density
+                )
+            )
