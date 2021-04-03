@@ -56,6 +56,12 @@ class GameState(Enum):
     LOST = auto()
     WON = auto()
 
+INTRO_MESSAGE = """
+They framed your cat for illegal stonks trades.
+You're busting her out of jail.
+Avoid the enemies for 2 minutes to escape!
+Press SPACE to start!
+"""
 
 class GameView(arcade.View):
 
@@ -99,7 +105,7 @@ class GameView(arcade.View):
         self.ui_manager.purge_ui_elements()
 
         self.message_display_box = UILabel(
-            "Press SPACE to start your escape",
+            INTRO_MESSAGE,
             center_x=BASE_WIDTH_PX / 2,
             center_y=3 * (BASE_HEIGHT_PX / 4),
             id="message_display_box"
@@ -108,7 +114,7 @@ class GameView(arcade.View):
         # setting font doesn't appear to work
         self.message_display_box.set_style_attrs(
             font_name=["Courier", "Courier New", "Lucida Console"],
-            font_size=8
+            font_size=7
         )
 
         self.ui_manager.add_ui_element(
@@ -164,11 +170,6 @@ class GameView(arcade.View):
             # clear messages if need be
             if self.message_display_box.text and self.message_timer.remaining == 0:
                 self.message_display_box.text = ""
-
-            if self.player.move_state == MoveState.JUMPING:
-                self.show_message("jumping")
-            else:
-                self.show_message("not jumping")
 
             self.enemy_spawner.update(delta_time=delta_time)
             self.sprite_list.update()
