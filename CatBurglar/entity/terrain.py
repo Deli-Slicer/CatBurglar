@@ -4,6 +4,7 @@ from CatBurglar.util.asset_loading import (
     preload_entity_texture_table
 )
 
+TILE_SIZE_PX = 16
 TILE_PATH = ASSET_BASE_PATH / "tiles"
 
 GROUND_BASE_PATH = TILE_PATH / "ground"
@@ -24,3 +25,5 @@ class AnimatedFloorTile(NamedAnimationsSprite):
             animations=GROUND_ANIMATION_TABLE,
             default_animation="ground_left"
         )
+
+

@@ -5,17 +5,14 @@ import pyglet.gl as gl
 from arcade import SpriteList
 
 from CatBurglar.entity.physics import RunnerPhysicsEngine
-from CatBurglar.entity.terrain import AnimatedFloorTile
+from CatBurglar.entity.terrain import AnimatedFloorTile, TILE_SIZE_PX
 from CatBurglar.input.KeyHandler import KeyHandler
 from CatBurglar.graphics.Camera import Camera
 from CatBurglar.entity.Player import Player
 from CatBurglar.entity.cop import BasicRunnerCop, Drone
-from CatBurglar.util import CountdownTimer
 
 WIDTH = 800
 HEIGHT = 450
-
-TILE_SIZE_PX = 16
 
 MIN_WIDTH = 160
 MIN_HEIGHT = 90
