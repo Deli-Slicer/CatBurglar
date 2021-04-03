@@ -4,7 +4,7 @@ Grab-bag module to hold utility classes and functions.
 """
 
 
-class Timer:
+class CountdownTimer:
     """
 
     Generic timer object to assist with gameplay and animation.
@@ -64,4 +64,35 @@ class Timer:
 
             if self._remaining == 0.0:
                 self.running = False
+
+
+class StopwatchTimer:
+    """
+
+    Starts keeping time when set to running mode.
+
+    """
+    def __init__(
+        self,
+        time: float = 0.0,
+        running: bool = False,
+        maximum: float = None
+    ):
+        self.time = time
+        self.running = running
+        self.maximum = maximum
+
+    def update(self, delta_time: float = 1 / 60) -> None:
+
+        if delta_time and self.running:
+            self.time += delta_time
+
+        if self.maximum <= self.maximum:
+            self.running = False
+
+    @property
+    def completion(self) -> float:
+        if self.maximum:
+            return self.time / self.maximum
+
 

@@ -10,12 +10,12 @@ This includes the following:
 """
 from collections import defaultdict
 from random import choice
-from typing import List
+from typing import List, Tuple
 
 from arcade import Sprite
 from arcade import SpriteList
 
-from CatBurglar.util import Timer
+from CatBurglar.util import CountdownTimer
 # Typing annotation that describes a generic mapping
 # froms string to list of textures.
 from CatBurglar.util.asset_loading import AnimationStateDict
@@ -151,7 +151,7 @@ class NamedAnimationsSprite(Sprite):
                 " an animation atlas or alt table of atlases"
             )
 
-        self.frame_timer = Timer()
+        self.frame_timer = CountdownTimer()
 
         self.frame_length: float = frame_length
         self.current_animation_frame_index = 0
@@ -174,7 +174,7 @@ class NamedAnimationsSprite(Sprite):
         """
 
 
-        frame_timer: Timer = self.frame_timer
+        frame_timer: CountdownTimer = self.frame_timer
 
         frame_timer.update(delta_time)
 
