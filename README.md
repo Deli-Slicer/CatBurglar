@@ -1,6 +1,6 @@
 # CatBurglar
  
-A quick entry for PyWeek 31. 
+A quick entry for PyWeek 31. The theme given was "Cops".
  
 > You are a gorilla. Your cat was framed for illegal stonks trading, so you snuck into jail to bust her out. Now you need to make your escape!
 
@@ -44,7 +44,7 @@ You will need to have the virtual environment activated to run the game. If you 
 
 #### 1. Set up a virtual environment
 
-Follow the steps 1-5 above to create a virtual environment, or use your preferred manner.
+Follow steps 1-5 above to create a virtual environment, or use your preferred manner.
 
 #### 2. Set up your development environment for debugging
 If you use a debugger in an IDE, you may need to alter the path that is set as the working directory when debugging from
