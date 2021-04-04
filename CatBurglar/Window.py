@@ -148,10 +148,9 @@ class GameView(arcade.View):
 
     def on_update(self, delta_time):
 
-        # clear expired messages
         if self.game_state == GameState.INTRO and self.key_handler.is_pressed("JUMP"):
             self.game_state = GameState.PLAYING
-            self.show_message("")
+            self.show_message("Presss SPACE to jump")
             return
 
         elif self.game_state == GameState.PLAYING:
