@@ -1,6 +1,6 @@
 from setuptools import setup, find_packages
 
-install_requires = ['arcade']
+install_requires = ['arcade>=2.5.6']
 
 with open("README.md", "r") as longfile:
     long_description = longfile.read()
