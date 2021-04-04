@@ -41,7 +41,7 @@ pip install -e .
 
 #### 6. Run the game
 ```
-CatBurglar
+catburglar
 ```
 You will need to have the virtual environment activated to run the game. If you open a new terminal
 (such as after restarting your computer), you will need to activate the shell again.
