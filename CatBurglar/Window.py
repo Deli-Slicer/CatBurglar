@@ -1,25 +1,30 @@
+from enum import Enum, auto
 from typing import Type
 
 import arcade
 import pyglet.gl as gl
 from arcade import SpriteList
+from arcade.gui import UIManager, UILabel
+from arcade.gui.ui_style import UIStyle
 
 from CatBurglar.entity.physics import RunnerPhysicsEngine
 from CatBurglar.entity.spawner import EnemySpawner
 from CatBurglar.entity.terrain import AnimatedFloorTile, TILE_SIZE_PX, WIDTH_IN_TILES, HEIGHT_IN_TILES
 from CatBurglar.input.KeyHandler import KeyHandler
 from CatBurglar.graphics.Camera import Camera
-from CatBurglar.entity.Player import Player
+from CatBurglar.entity.Player import Player, MoveState
 from CatBurglar.entity.cop import BasicRunnerCop, Drone
-from CatBurglar.util import StopwatchTimer
+from CatBurglar.util import StopwatchTimer, CountdownTimer
 
+# size of display before viewport scaling
+BASE_WIDTH_PX = WIDTH_IN_TILES * TILE_SIZE_PX
+BASE_HEIGHT_PX = HEIGHT_IN_TILES * TILE_SIZE_PX
+
+# upscaling for viewport size
 ZOOM_FACTOR = 4
+SCALED_WIDTH_PX = BASE_WIDTH_PX * ZOOM_FACTOR
+SCALED_HEIGHT_PX = BASE_HEIGHT_PX * ZOOM_FACTOR
 
-WIDTH_PX = WIDTH_IN_TILES * TILE_SIZE_PX * ZOOM_FACTOR
-HEIGHT_PX = HEIGHT_IN_TILES * TILE_SIZE_PX * ZOOM_FACTOR
-
-MIN_WIDTH = 160
-MIN_HEIGHT = 90
 
 TITLE = "Cat Burglar"
 
@@ -37,15 +42,23 @@ def spawn_entities_from_map_layer(
             new_entity.set_position(reference.center_x, reference.center_y)
             destination_list.append(new_entity)
 
-class Window(arcade.Window):
+class GameState(Enum):
+    INTRO = auto()
+    PLAYING = auto()
+    LOST = auto()
+    WON = auto()
+
+INTRO_MESSAGE = """
+They framed your cat for illegal stonks trades.
+You're busting her out of jail.
+Avoid the enemies for 2 minutes to escape!
+Press SPACE to start!
+"""
+
+class GameView(arcade.View):
 
     def __init__(self):
-        super().__init__(WIDTH_PX, HEIGHT_PX, TITLE, resizable=RESIZABLE)
-
-        self.center_window()
-
-        if RESIZABLE:
-            self.set_min_size(MIN_WIDTH, MIN_HEIGHT)
+        super().__init__()
 
         self.physics_engine: RunnerPhysicsEngine = None
         self.wall_list: SpriteList = None
@@ -59,16 +72,54 @@ class Window(arcade.Window):
         self.global_time_elapsed: StopwatchTimer = None
         self.enemy_spawner: EnemySpawner = None
 
+        self.message_display_box: UILabel = None
+        self.message_timer = CountdownTimer()
+
+        self.ui_manager = UIManager()
+        self.game_state: GameState = GameState.INTRO
+
+        # kludge to debounce the jump key
+        self.game_over_debounce: bool = False
+
+    def show_message(self, msg: str, duration: float = 2.0):
+
+        # Extend timer instead of redrawing text
+        if self.message_display_box.text == msg:
+            self.message_timer.remaining = duration
+
+            # It's ok to set the new message
+        else:
+            self.message_display_box.text = msg
+            self.message_timer.remaining = duration
+
+
     def setup(self):
+        self.ui_manager.purge_ui_elements()
+
+        self.message_display_box = UILabel(
+            INTRO_MESSAGE,
+            center_x=BASE_WIDTH_PX / 2,
+            center_y=3 * (BASE_HEIGHT_PX / 4),
+            id="message_display_box"
+        )
+
+        # setting font doesn't appear to work
+        self.message_display_box.set_style_attrs(
+            font_name=["Courier", "Courier New", "Lucida Console"],
+            font_size=7
+        )
+
+        self.ui_manager.add_ui_element(
+            self.message_display_box
+        )
+
         ground_level_y = TILE_SIZE_PX
         self.sprite_list = arcade.SpriteList()
         self.key_handler = KeyHandler()
 
-        self.camera = Camera(self.width, self.height, True)
-        self.zoom_speed = .95
 
         self.player = Player(self.key_handler)
-        self.player.set_position(2 * TILE_SIZE_PX, ground_level_y)
+        self.player.set_position(2 * TILE_SIZE_PX, ground_level_y * 2)
         self.sprite_list.append(self.player)
 
         # the ground will animate to create the illusion of motion
@@ -96,31 +147,63 @@ class Window(arcade.Window):
         )
 
     def on_update(self, delta_time):
-        self.global_time_elapsed.update(delta_time=delta_time)
-        self.enemy_spawner.update(delta_time=delta_time)
-        self.sprite_list.update()
-        self.enemy_list.update()
 
-        collisions = self.physics_engine.update()
-        if collisions:
-            print(f"Collided with the following entities: {collisions!r}")
+        if self.game_state == GameState.INTRO and self.key_handler.is_pressed("JUMP"):
+            self.game_state = GameState.PLAYING
+            self.show_message("Presss SPACE to jump")
+            return
 
-        self.wall_list.update_animation()
+        elif self.game_state == GameState.PLAYING:
 
-        self.sprite_list.update_animation(delta_time=delta_time)
-        self.enemy_list.update_animation(delta_time=delta_time)
-        #if self.key_handler.is_pressed("ZOOM_IN"):
-        #    self.camera.zoom(self.zoom_speed)
-        #elif self.key_handler.is_pressed("ZOOM_OUT"):
-        #    self.camera.zoom(1 / self.zoom_speed)
+            self.global_time_elapsed.update(delta_time=delta_time)
+            self.message_timer.update(delta_time=delta_time)
 
-        #self.camera.scroll_to(self.player.center_x, self.player.center_y)
+            # clear messages if need be
+            if self.message_display_box.text and self.message_timer.remaining == 0:
+                self.message_display_box.text = ""
+
+            self.enemy_spawner.update(delta_time=delta_time)
+            self.sprite_list.update()
+            self.enemy_list.update()
+
+            collisions = self.physics_engine.update()
+            if collisions:
+                self.game_state = GameState.LOST
+                self.show_message("You have failed to escape!\nPress SPACE again to exit.")
+
+            self.enemy_list.update_animation(delta_time=delta_time)
+            self.sprite_list.update_animation(delta_time=delta_time)
+            self.wall_list.update_animation(delta_time=delta_time)
+
+            if self.global_time_elapsed.completion == 1.0:
+                self.game_state = GameState.WON
+                self.show_message("You have rescued your cat!\nPress SPACE again to exit.")
+
+        elif self.game_state == GameState.LOST:
+            if self.key_handler.is_pressed("JUMP"):
+                if not self.game_over_debounce:
+                    pass
+                else:
+                    self.window.close()
+            else:
+                self.game_over_debounce = True
+
+        # end-of-competition rush, bad copy and paste code.
+        elif self.game_state == GameState.LOST:
+            if self.key_handler.is_pressed("JUMP"):
+                if not self.game_over_debounce:
+                    pass
+                else:
+                    self.window.close()
+            else:
+                self.game_over_debounce = True
+
 
     def on_draw(self):
         arcade.start_render()
 
         # upscale by 4x
-        arcade.set_viewport(0, WIDTH_PX / 4, 0, HEIGHT_PX / 4)
+        arcade.set_viewport(0, SCALED_WIDTH_PX / 4, 0, SCALED_HEIGHT_PX / 4)
 
         # self.camera.set_viewport()
         self.sprite_list.draw(filter=gl.GL_NEAREST)
