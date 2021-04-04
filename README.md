@@ -1,6 +1,6 @@
 # CatBurglar
  
-A quick entry for PyWeek 31. The theme given was "Cops".
+A quick entry for [PyWeek](https://pyweek.org). [The theme given for pyweek 31 was "Cops".](https://pyweek.org/31/)
  
 > You are a gorilla. Your cat was framed for illegal stonks trading, so you snuck into jail to bust her out. Now you need to make your escape!
 
