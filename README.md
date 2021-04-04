@@ -13,7 +13,7 @@ Press space to jump over enemies. The longer you hold space, the higher you jump
 See [this guide](https://www.freecodecamp.org/news/the-python-guide-for-beginners/#installingpython3) for information
  on how to install it.
   
-Arcade >= 2.5.6 and dependencies are also required. They will be installed by following the instructions below.
+[Arcade](https://arcade.academy/) >= 2.5.6 and dependencies are also required. They will be installed by following the instructions below.
 
 ### Installation for Players
 
